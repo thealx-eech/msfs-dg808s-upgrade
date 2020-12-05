@@ -1,0 +1,15 @@
+{
+  "dependencies": [],
+  "content_type": "AIRCRAFT",
+  "title": "DG808S Paint1",
+  "manufacturer": "DG Flugzeugbau",
+  "creator": "Microsoft Corporation",
+  "package_version": "1.0.0",
+  "minimum_game_version": "1.17.10",
+  "release_notes": {
+    "neutral": {
+      "LastUpdate": "",
+      "OlderHistory": ""
+    }
+  }
+}

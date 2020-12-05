@@ -1,0 +1,274 @@
+{
+  "content": [
+    {
+      "path": "manifest.json",
+      "size": 335,
+      "date": 132486402257454546
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/aircraft.cfg",
+      "size": 11474,
+      "date": 132486403003517241
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/cameras.cfg",
+      "size": 10547,
+      "date": 132486402779615543
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/cockpit.cfg",
+      "size": 1625,
+      "date": 132486403440851701
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/DG808S.air",
+      "size": 4970,
+      "date": 128019062600000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/DG808S_check.htm",
+      "size": 23610,
+      "date": 127985337800000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/DG808S_ref.htm",
+      "size": 5342,
+      "date": 127961141900000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/engines.cfg",
+      "size": 10530,
+      "date": 132486403140835051
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/flight_model.cfg",
+      "size": 9843,
+      "date": 132486403246367763
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/gameplay.cfg",
+      "size": 321,
+      "date": 132486402779771797
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/runway.flt",
+      "size": 491,
+      "date": 132486403558254779
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/systems.cfg",
+      "size": 9250,
+      "date": 132486403613526322
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/model/DG808S.mdl",
+      "size": 3386335,
+      "date": 128019022820000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/model/DG808S_Interior.mdl",
+      "size": 3963351,
+      "date": 128019022940000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/model/model.cfg",
+      "size": 51,
+      "date": 127997561060000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/DG808s_Panel_Gauges_1.bmp",
+      "size": 66612,
+      "date": 127919100240000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/DG808s_Panel_Gauges_2.bmp",
+      "size": 66612,
+      "date": 127919100240000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/DG_808S_background.bmp",
+      "size": 787508,
+      "date": 127919100240000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/DG_808S_landing_background.bmp",
+      "size": 787508,
+      "date": 127919100240000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/panel.cfg",
+      "size": 414,
+      "date": 132486403928434538
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/panel/Schweizer_Panel_Decals.bmp",
+      "size": 263220,
+      "date": 127919100240000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/sound/Asobo_VL3.PC.PCK",
+      "size": 88499434,
+      "date": 132464513540000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/sound/sound.xml",
+      "size": 20476,
+      "date": 132464513540000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/sound/vario_neg.wav",
+      "size": 22618,
+      "date": 132483923652523362
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/sound/vario_pos.wav",
+      "size": 10330,
+      "date": 132483662596009566
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/sound/vario_tone.xml",
+      "size": 1464,
+      "date": 132487984758591494
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Soundai/Asobo_VL3_AI.PC.PCK",
+      "size": 10160750,
+      "date": 132464513540000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Soundai/soundai.xml",
+      "size": 2657,
+      "date": 132464513540000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_1_c.dds",
+      "size": 699176,
+      "date": 128019022460000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_2_c.dds",
+      "size": 699176,
+      "date": 128019022480000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_c.dds",
+      "size": 174888,
+      "date": 128019022480000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/DG808s_Pilot.dds",
+      "size": 43816,
+      "date": 128019022500000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_reflection.dds",
+      "size": 87504,
+      "date": 128019022500000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_t.dds",
+      "size": 1398224,
+      "date": 128019022540000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_t_bump.dds",
+      "size": 1048704,
+      "date": 128019022560000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_t_spec.dds",
+      "size": 1398224,
+      "date": 128019022580000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/fresnel_ramp.dds",
+      "size": 640,
+      "date": 128019022600000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/texture.cfg",
+      "size": 137,
+      "date": 128000679780000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/thumbnail.jpg",
+      "size": 5698,
+      "date": 128000021400000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.1/DG808S_T.dds",
+      "size": 1398224,
+      "date": 128019022620000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.1/DG808S_T_spec.dds",
+      "size": 1398224,
+      "date": 128019022640000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.1/Fresnel_Ramp.dds",
+      "size": 640,
+      "date": 128019022640000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.1/texture.cfg",
+      "size": 137,
+      "date": 128000679780000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.1/thumbnail.jpg",
+      "size": 5865,
+      "date": 128000021400000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.2/DG808S_T.dds",
+      "size": 1398224,
+      "date": 128019022660000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.2/DG808S_T_spec.dds",
+      "size": 1398224,
+      "date": 128019022700000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.2/Fresnel_Ramp.dds",
+      "size": 640,
+      "date": 128019022700000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.2/texture.cfg",
+      "size": 137,
+      "date": 128000679780000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.2/thumbnail.jpg",
+      "size": 5613,
+      "date": 128000021400000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.3/DG808S_T.dds",
+      "size": 1398224,
+      "date": 128019022720000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.3/DG808S_T_spec.dds",
+      "size": 1398224,
+      "date": 128019022740000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.3/Fresnel_Ramp.dds",
+      "size": 640,
+      "date": 128019022740000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.3/texture.cfg",
+      "size": 137,
+      "date": 128000679780000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/Texture.3/thumbnail.jpg",
+      "size": 5739,
+      "date": 128000021400000000
+    }
+  ]
+}
