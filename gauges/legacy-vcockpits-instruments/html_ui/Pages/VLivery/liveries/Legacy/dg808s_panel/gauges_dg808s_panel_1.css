@@ -1,0 +1,805 @@
+/** This mixin makes a single line element fit exactly on the Roboto font for easier integration. */
+@font-face {
+  font-family: "Font-Italic";
+  src: url("/Fonts/Roboto-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+@font-face {
+  font-family: "Font-Bold";
+  src: url("/Fonts/Roboto-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+@font-face {
+  font-family: "Font-BoldItalic";
+  src: url("/Fonts/Roboto-BoldItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+@font-face {
+  font-family: "Font-Medium";
+  src: url("/Fonts/Roboto-Medium.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+gauges_dg808s_panel_1-element {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/DG808s_Panel_Gauges_1.png");
+  background-color: #111;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+  gauges_dg808s_panel_1-element #Mainframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+	height: 100%;
+	background: transparent;
+  }
+	
+    gauges_dg808s_panel_1-element #Mainframe #background {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+	  background: transparent;
+	  }
+
+gauges_dg808s_panel_1-element #Mainframe #altimeter {
+		position: absolute;
+		overflow: hidden;
+		left: 9px;
+		top: 11px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 103px;
+		height: 103px;
+
+		transform: scale(calc(1 * 109 / 103), calc(1 * 108 / 103));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_kohlsman_strip_0_mask {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 14px;
+		height: 20px;
+		left: 87.000px;
+		top: 42.000px;
+}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_kohlsman_strip_0_mask_image {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_kohlsman_strip_altimeter_kohlsman_strip_mask.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%; 
+}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_kohlsman_strip_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_kohlsman_strip.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 19px;
+		height: 214px;
+		left: -2.000px;
+		top: -0.000px;
+		transform-origin: 2.000px 0.000px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_ten_thousands_needle_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_ten_thousands_needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 58px;
+		height: 75px;
+		left: calc(57.000px - 28.000px);
+		top: calc(51.500px - 50.500px);
+		transform-origin: 28.000px 50.500px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_thousands_needle_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_thousands_needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 40px;
+		left: calc(57.000px - 5.000px);
+		top: calc(51.500px - 26.500px);
+		transform-origin: 5.000px 26.500px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_hundreds_needle_3 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_hundreds_needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 66px;
+		height: 7px;
+		left: calc(57.000px - 45.000px);
+		top: calc(51.500px - 3.500px);
+		transform-origin: 45.000px 3.500px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #altimeter_altimeter_kohlsman_knob_4 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter_altimeter_kohlsman_knob.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 24px;
+		height: 23px;
+		left: calc(0.000px - 0px);
+		top: calc(85.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #turn_bank {
+		position: absolute;
+		overflow: hidden;
+		left: 11px;
+		top: 142px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/turn_bank_turn_bank_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 78px;
+		height: 78px;
+
+		transform: scale(calc(1 * 78 / 78), calc(1 * 78 / 78));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #turn_bank_turn_bank_off_flag_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/turn_bank_turn_bank_off_flag.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 13px;
+		height: 6px;
+		left: calc(50.000px - 0px);
+		top: calc(22.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #turn_bank_turn_bank_ball_overlay_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/turn_bank_turn_bank_ball_overlay.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 15px;
+		left: calc(34.000px - 0px);
+		top: calc(34.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #turn_bank_turn_bank_needle_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/turn_bank_turn_bank_needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 10px;
+		height: 68px;
+		left: calc(39.125px - 5.0px);
+		top: calc(70.500px - 59.500px);
+		transform-origin: 5.0px 59.500px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #oat {
+		position: absolute;
+		overflow: hidden;
+		left: 232px;
+		top: 118px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/oat_oat_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 10px;
+		height: 44px;
+
+		transform: scale(calc(1 * 10 / 10), calc(1 * 44 / 44));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #oat_oat_strip_0_mask {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 10px;
+		height: 44px;
+		left: 0.000px;
+		top: 0.000px;
+}
+gauges_dg808s_panel_1-element #Mainframe #oat_oat_strip_0_mask_image {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/oat_oat_strip_oat_mask.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%; 
+}
+gauges_dg808s_panel_1-element #Mainframe #oat_oat_strip_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/oat_oat_strip.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 14px;
+		height: 296px;
+		left: -3.000px;
+		top: -0.000px;
+		transform-origin: 3.000px 0.000px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #oat_oat_line_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/oat_oat_line.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 10px;
+		height: 1px;
+		left: calc(0.000px - 0px);
+		top: calc(21.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #oat_oat_shadow_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/oat_oat_shadow.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 10px;
+		height: 44px;
+		left: calc(0.000px - 0px);
+		top: calc(0.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #electrical_buttons {
+		position: absolute;
+		overflow: hidden;
+		left: 190px;
+		top: 189px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/electrical_buttons_electrical_buttons_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 64px;
+		height: 65px;
+
+		transform: scale(calc(1 * 64 / 64), calc(1 * 65 / 65));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #electrical_buttons_VARIO_0 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(32.000px - 0px);
+		top: calc(32.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #electrical_buttons_GYRO_1 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(0.000px - 0px);
+		top: calc(32.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #electrical_buttons_AVCS_2 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(0.000px - 0px);
+		top: calc(0.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio {
+		position: absolute;
+		overflow: hidden;
+		left: 140px;
+		top: 3px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 91px;
+		height: 91px;
+
+		transform: scale(calc(1 * 91 / 91), calc(1 * 91 / 91));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_knob_power_and_volume_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_knob_power_and_volume.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 12px;
+		height: 12px;
+		left: calc(18.000px - 0px);
+		top: calc(71.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_standby_out_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_standby_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 14px;
+		height: 20px;
+		left: calc(73.000px - 0px);
+		top: calc(39.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_standby_in_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_standby_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 14px;
+		height: 20px;
+		left: calc(73.000px - 0px);
+		top: calc(39.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_mode_out_3 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_mode_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 15px;
+		left: calc(46.000px - 0px);
+		top: calc(7.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_mode_in_4 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_mode_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 15px;
+		left: calc(46.000px - 0px);
+		top: calc(7.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_squelch_out_5 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_squelch_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 16px;
+		left: calc(27.000px - 0px);
+		top: calc(6.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_squelch_in_6 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_squelch_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 16px;
+		left: calc(27.000px - 0px);
+		top: calc(6.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_sto_out_7 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_sto_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 21px;
+		left: calc(2.000px - 0px);
+		top: calc(38.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_radio_button_sto_in_8 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/radio_radio_button_sto_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 21px;
+		left: calc(2.000px - 0px);
+		top: calc(38.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_Transmission_Indication_9 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(20.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+		font-weight: bold;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 13px;
+		font-weight: 1;
+		text-align: CENTER;
+		overflow: hidden; max-width: 1ch;
+		width: 11px;
+		height: 13px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_Active_Frequency_10 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(31.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 13px;
+		font-weight: 1;
+		text-align: RIGHT;
+		overflow: hidden; max-width: 6ch;
+		width: 38px;
+		height: 13px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_1-element #Mainframe #radio_Standby_Frequency_11 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(36.000px - 0px);
+		top: calc(42.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 10px;
+		font-weight: 1;
+		text-align: RIGHT;
+		overflow: hidden; max-width: 7ch;
+		width: 32px;
+		height: 10px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder {
+		position: absolute;
+		overflow: hidden;
+		left: 137px;
+		top: 101px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder _background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 81px;
+		height: 81px;
+
+		transform: scale(calc(1 * 81 / 81), calc(1 * 81 / 81));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_standby_out_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_standby_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 21px;
+		left: calc(66.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_standby_in_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_standby_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 21px;
+		left: calc(66.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_mode_out_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_mode_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 12px;
+		left: calc(42.000px - 0px);
+		top: calc(9.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_mode_in_3 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_mode_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 12px;
+		left: calc(42.000px - 0px);
+		top: calc(9.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_squelch_out_4 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_squelch_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 12px;
+		left: calc(20.000px - 0px);
+		top: calc(9.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_squelch_in_5 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_squelch_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 12px;
+		left: calc(20.000px - 0px);
+		top: calc(9.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_sto_out_6 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_sto_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 21px;
+		left: calc(5.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_transponder_button_sto_in_7 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/transponder_transponder_button_sto_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 11px;
+		height: 21px;
+		left: calc(5.000px - 0px);
+		top: calc(30.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_Transponder_Code_8 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(29.000px - 0px);
+		top: calc(26.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 13px;
+		font-weight: 1;
+		text-align: RIGHT;
+		overflow: hidden; max-width: 4ch;
+		width: 30px;
+		height: 14px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_1-element #Mainframe #transponder_Mode_C_Altitude_Display_9 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(31.000px - 0px);
+		top: calc(38.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 10px;
+		font-weight: 1;
+		text-align: RIGHT;
+		overflow: hidden; max-width: 7ch;
+		width: 28px;
+		height: 10px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_1-element #Mainframe #compass {
+		position: absolute;
+		overflow: hidden;
+		left: 103px;
+		top: 194px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 81px;
+		height: 59px;
+
+		transform: scale(calc(1 * 81 / 81), calc(1 * 59 / 59));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_strip_0_mask {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 50px;
+		height: 35px;
+		left: 15.000px;
+		top: 20.000px;
+}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_strip_0_mask_image {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_strip_compass_mask.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%; 
+}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_strip_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_strip.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 348px;
+		height: 55px;
+		left: -0.000px;
+		top: -3.000px;
+		transform-origin: 0.000px 3.000px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_shadow_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_shadow.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 81px;
+		height: 59px;
+		left: calc(0.000px - 0px);
+		top: calc(0.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_highlight_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_highlight.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(0.000px - 0px);
+		top: calc(0.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_1-element #Mainframe #compass_compass_lubber_line_3 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/compass_compass_lubber_line.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 2px;
+		height: 35px;
+		left: calc(40.000px - 0px);
+		top: calc(19.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+
