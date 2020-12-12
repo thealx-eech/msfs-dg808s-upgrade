@@ -49,3 +49,25 @@ EngineMasterSwitch=True
 GlowPlugTemperaturePct=1
 Afterburner=0
 
+[Systems.0]
+BatterySwitch=True
+
+[Switches.0]
+PitotHeat=False
+PitotHeat_EX1=2
+WindshieldDeice=2
+BeaconLights=True
+LandingLights=True
+LogoLights=True
+NavLights=True
+PanelLights=True
+PanelLightsNight=True
+RecognitionLights=True
+StrobeLights=True
+TaxiLights=False
+WingLights=True
+CabinLights=False
+GlareshieldLights=False
+PedestalLights=False
+
+

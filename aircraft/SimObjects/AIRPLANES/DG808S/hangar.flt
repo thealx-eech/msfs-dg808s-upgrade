@@ -1,0 +1,96 @@
+
+[SIMVARS.0]
+
+pvelbodyaxis = 0 ; 
+bvelbodyaxis = 0 ; 
+hvelbodyaxis = 0 ; 
+xvelbodyaxis = 0 ; 
+yvelbodyaxis = 0 ; 
+zvelbodyaxis = 0 ; 
+simonground = False ; 
+
+[Controls.0]
+
+SpoilersHandle=000.00
+FlapsHandle=028.57
+LeftFlap=000.00
+RightFlap=000.00
+GearsHandle=000.00
+Gear1=000.00
+Gear2=100.00
+Gear3=100.00
+YokeY=050.00
+YokeX=050.00
+Rudder=050.00
+LeftBrake=000.00
+RightBrake=000.00
+ParkingBrake=000.00
+ElevatorTrim=050.00
+RudderTrimPct=0
+AileronTrimPct=0
+AileronTrimDisabled=False
+ElevatorTrimDisabled=False
+RudderTrimDisabled=False
+SpoilersArmed=False
+AntiSkidActive=False
+
+[Fuel.0]
+TankSelector=All
+TankSelector1=All
+Center=0
+LeftMain=0
+RightMain=0
+LeftAux=0
+RightAux=0
+LeftTip=0
+RightTip=0
+Center 2=0
+Center 3=0
+External 1=0
+External 2=0
+
+[Engine Parameters.1.0]
+ThrottleLeverPct=1
+PropellerLeverPct=1
+MixtureLeverPct=0
+Pct Engine RPM=0.067047161835216584347
+MaxReachedEngineRPM=30440.126051649815054
+Pct N1=0.6855389440459599415
+Pct N2=6.7047161835216577686
+LeftMagneto=True
+RightMagneto=True
+GeneratorSwitch=True
+CowlFlapPct=0
+FuelPumpSwitch=False
+FuelPumpSwitch_EX1=0
+FuelValveOpen=False
+CarbHeat/DeiceSwitch=False
+EngineMasterSwitch=True
+GlowPlugTemperaturePct=1
+IgnitionSwitch=0
+StarterSwitch=False
+EGT_DegR=497.30303955078125
+ITT_DegR=1130.1024589295952865
+Afterburner=0
+
+[Systems.0]
+BatterySwitch=True
+
+[Switches.0]
+PitotHeat=False
+PitotHeat_EX1=2
+WindshieldDeice=2
+BeaconLights=True
+LandingLights=True
+LogoLights=True
+NavLights=True
+PanelLights=True
+PanelLightsNight=True
+RecognitionLights=True
+StrobeLights=True
+TaxiLights=False
+WingLights=True
+CabinLights=False
+GlareshieldLights=False
+PedestalLights=False
+

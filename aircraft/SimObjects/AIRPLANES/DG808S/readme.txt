@@ -15,11 +15,11 @@ Automatic installer support two installation modes: Install (installed Flight Si
 1. Unpack and launch MSFS_Legacy_DG808S_#.exe files
 2. Choose preferable installation method
 3. If Install selected, you need to choose Flight Simulator X installation folder (root of it, not DG808 aircraft folder)
-4. Find your MSFS Community folder (if you have problems with that - read this article https://www.flightsim.com/vbfs/content.php?21235-Finding-The-MSFS-2020-Community-Folder )
+4. Regadless selected option, find your MSFS Community folder (if you have problems with that - read this article https://www.flightsim.com/vbfs/content.php?21235-Finding-The-MSFS-2020-Community-Folder ). You can't install add-on in some other folder, or installer will be not able to find file Asobo_VL3.PC.PCK (you will need to copy it into \sound\ manually).
 5. Installation process will started, which includes:
 5.1 If Install selected, FSX files will be copied into Community folder
-5.2 "\sound\sound.cfg" and "\DG808S.air" deleted from aircraft folder
-5.3 Asobo_VL3.PC.PCK copied from "\Official\OneStore\asobo-aircraft-vl3\" or "\Official\Steam\asobo-aircraft-vl3\" folder (depends on installed MSFS version)
+5.2 "\sound\" and "\DG808S.air" deleted from aircraft folder
+5.3 Asobo_VL3.PC.PCK and Asobo_VL3_AI.PC.PCK copied from "\Official\OneStore\asobo-aircraft-vl3\" or "\Official\Steam\asobo-aircraft-vl3\" folder (depends on installed MSFS version)
 5.4 Add-on files extracted into aircraft folder
 5.5 msfsJSONgen.exe copied into Community folder
 5.6 Converted gauges extracted into "\Community\legacy-vcockpits-instruments\" folder
@@ -32,12 +32,9 @@ ISSUES
 
 EXE file of this installer is unsigned, so Windows Defender/some other antivirus software may be triggered. Each update build will be submit into Microsoft Security Intelligence service to make sure it will be not blocked by Windows Defender, but it take days until cloud database, and then your client, will be updated. If you experience such issue – you may try to apply security intelligence manual update following this instruction https://www.microsoft.com/en-us/wdsi/defenderupdates and then try to run application again.
 
-If you experience "Too long filename" error in installation process, or your Community folder is inside of USERS directory (and as result has really long path name), first of all check that LongPathsEnabled value is equal to "1" in your windows registry
-https://www.howtogeek.com/266621/how-to-make-windows-10-accept-file-paths-over-260-characters/
+If you experience "Too long filename" error in installation process, or your Community folder is inside of USERS directory (and as result has really long path name), first of all check that LongPathsEnabled value is equal to "1" in your windows registry https://www.howtogeek.com/266621/how-to-make-windows-10-accept-file-paths-over-260-characters/
 
-Flight model of this aircraft does not act realistic at speed more than 200 knots. Avoid overspeed but changing flaps position or engaging air brakes.
-
-Remove fuel right after game start if you don't need it
+Remove fuel right after game start if you don't need it, or increase amount from 50% to 100%.
 
 ---------------------
 
@@ -48,10 +45,12 @@ LIST OF CONFIG FILES CHANGES
 [WEIGHT_AND_BALANCE]
 
 empty_weight = 772 ; (pounds)
-empty_weight_cg_position = -2.7545,  0.0, 0.00 ; -1.93 (feet) longitudinal, lateral, vertical distance from specified datum
+empty_weight_cg_position = -2.2693,  0.0, 0.00 ; -1.93 (feet) longitudinal, lateral, vertical distance from specified datum
 
-station_load.1 = 0, -2.077,  0.0, 0.0 ; Weight (lbs), longitudinal, lateral, vertical positions from datum (feet)
-station_name.1 = "ballast" ; 
+station_load.0 = 170, 1, 0, -0.5, TT:MENU.PAYLOAD.PILOT, 1
+station_load.1 = 0,  4.6797, 0, 0, TT:FRONT BALLAST
+station_load.2 = 0, -1.6797, 0, 0, TT:CG BALLAST
+station_load.3 = 0, -7.6797, 0, 0, TT:REAR BALLAST 
 
 [FLIGHT_TUNING]
 cruise_lift_scalar = 2 ;
@@ -59,7 +58,7 @@ parasite_drag_scalar = 0.5 ;
 induced_drag_scalar = 0.5	 ; 
 elevator_effectiveness = 1.0 ; 
 aileron_effectiveness = 2.0 ; 
-rudder_effectiveness = 2.0 ; 
+rudder_effectiveness = 1.0 ; 
 
 [FLAPS.0]
 lift_scalar = 2 ; Scalar coefficient to ponderate global flap lift coef (non dimensioned)
@@ -78,7 +77,7 @@ aero_center_lift = -0.75 ; -9.5 Init to center CA
 ENGINE - Inserted jet engines, to simulate a towing plane, with only 1 gallon of petrol, if you don't want to use this function just put 0 in the tank variable
 
 [FUEL]
-Engine.0 = -0.1, 0.0, -0.1
+Center1 = -1.6797, 0, 0, 1, 0 ; For each tank: Tank position (z longitudinal, x lateral, y vertical) (FEET), total fuel capacity (GALLONS), unusable fuel capacity (GALLONS)
 
 Edited the file - runway.flt - to have the engine ready when you start from the ground and with the brakes already off
 

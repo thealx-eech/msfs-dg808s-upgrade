@@ -7,13 +7,13 @@
   !include "MUI2.nsh"
 ;HASH plugin to make unique folder name
   !include "LogicLib.nsh"
-  ;!include "Sections.nsh"
+  !include "Sections.nsh"
   ;--------------------------------
 ;General
 	
   !define AIRPLANEID "dg808s"
   !define FSXAIRPLANEID "DG808S"
-  !define VERSION "0.1"
+  !define VERSION "0.2"
   !define BLDDIR "J:\MSFS2020\MSFS MODS\DG808S\"
   !define SHDDIR "${BLDDIR}aircraft\"
 
@@ -39,11 +39,6 @@ DirText "" "" "Browse" ""
 ;FSX PAGE
 Var fsxDir
 Var msfsDir
-Var /GLOBAL installationType
-
-Function testVar
-  StrCpy $installationType "Install"
-FunctionEnd
 
 Function .onInit
 	SetRegView 32
@@ -95,52 +90,27 @@ FunctionEnd
 
 Page instfiles
 
-Section /o "New install" sectionInstall
+Section "New install" sectionInstall
 
 	;COPY FSX FILES
 	CopyFiles "$fsxDir\SimObjects\Airplanes\${FSXAIRPLANEID}\*" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}"
 
-	;DELETE FSX FILES
-	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\sound.cfg"
-	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\DG808S.air"
-
-	;COPY ASOBOPCK
-	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
-	CopyFiles "$msfsDir\..\Official\Steam\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
-
-	;COPY ADD ON FILES
-	SetOutPath "$msfsDir\${AIRPLANEID}"
-	File /r "${SHDDIR}"
-
-	;COPY JSON GEN
-	SetOutPath "$msfsDir\"
-	File "${BLDDIR}\JSONgen\msfsJSONgen.exe"
-	Exec '"$msfsDir\msfsJSONgen.exe" "$msfsDir\${AIRPLANEID}"'
-
-	;RUN JSON GEN
-	SetOutPath "$msfsDir\"
-	File /r "${BLDDIR}\gauges\"
-	Exec '"$msfsDir\msfsJSONgen.exe" "$msfsDir\legacy-vcockpits-instruments"'
-	
-	;MISSING PCK WARNING
-	IfFileExists "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\Asobo_VL3.PC.PCK" +3 0
-	MessageBox MB_ICONEXCLAMATION \
-	"File $msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK does not exists. Aircraft sounds will not work.."
-
 SectionEnd
 
 Section /o "Update" sectionUpdate
-	;BACKUP SOUND.CFG
-	Rename "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\sound.cfg" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\.sound.cfg"
 
 	;DELETE FSX FILES
-	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\sound.cfg"
+	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\*.*"
+	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\Soundai\*.*"
 	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\DG808S.air"
+	Delete "$msfsDir\${AIRPLANEID}_CVT_\"
 
 	;COPY ASOBOPCK
 	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
+	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\soundai\Asobo_VL3_AI.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\soundai\"
 	CopyFiles "$msfsDir\..\Official\Steam\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
-
+	CopyFiles "$msfsDir\..\Official\Steam\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\soundai\Asobo_VL3_AI.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\soundai\"
+	
 	;COPY ADD ON FILES
 	SetOutPath "$msfsDir\${AIRPLANEID}"
 	File /r "${SHDDIR}"
@@ -165,6 +135,13 @@ SectionEnd
 Section "Show readme" sectionReadme
 	ExecShell "open" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\readme.txt"
 SectionEnd
+
+Function .onSelChange
+!insertmacro StartRadioButtons $1
+    !insertmacro RadioButton ${sectionInstall}
+    !insertmacro RadioButton ${sectionUpdate}
+!insertmacro EndRadioButtons
+FunctionEnd
 
 Function SkipPage
 	${If} ${SectionIsSelected} ${sectionUpdate}
@@ -192,8 +169,8 @@ FunctionEnd
 ;Descriptions
 
   ;Language strings
-  LangString DESC_sectionInstall ${LANG_ENGLISH} "Install Legacy aircraft using sources from Flight Simulator X (should be installed)"
-  LangString DESC_sectionUpdate ${LANG_ENGLISH} "Update Legacy aircraft (already imported into MSFS Community folder)"
+  LangString DESC_sectionInstall ${LANG_ENGLISH} "Import sources from Flight Simulator X (it should be installed)"
+  LangString DESC_sectionUpdate ${LANG_ENGLISH} "Update imported aircraft (inside of MSFS Community folder!)"
   LangString DESC_sectionReadme ${LANG_ENGLISH} "Show readme file on installation complete"
 
   ;Assign language strings to sections
