@@ -36,6 +36,8 @@ If you experience "Too long filename" error in installation process, or your Com
 
 Remove fuel right after game start if you don't need it, or increase amount from 50% to 100%.
 
+If you experience visual issues with yaw string, switch antialiasing settings from TAA to different one.
+
 ---------------------
 
 LIST OF CONFIG FILES CHANGES

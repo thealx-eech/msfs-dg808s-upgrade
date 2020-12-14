@@ -13,7 +13,7 @@
 	
   !define AIRPLANEID "dg808s"
   !define FSXAIRPLANEID "DG808S"
-  !define VERSION "0.2"
+  !define VERSION "0.3"
   !define BLDDIR "J:\MSFS2020\MSFS MODS\DG808S\"
   !define SHDDIR "${BLDDIR}aircraft\"
 
@@ -95,6 +95,37 @@ Section "New install" sectionInstall
 	;COPY FSX FILES
 	CopyFiles "$fsxDir\SimObjects\Airplanes\${FSXAIRPLANEID}\*" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}"
 
+	;DELETE FSX FILES
+	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\*.*"
+	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\Soundai\*.*"
+	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\DG808S.air"
+	RMDir /R "$msfsDir\${AIRPLANEID}_CVT_\"
+
+	;COPY ASOBOPCK
+	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
+	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\soundai\Asobo_VL3_AI.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\soundai\"
+	CopyFiles "$msfsDir\..\Official\Steam\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
+	CopyFiles "$msfsDir\..\Official\Steam\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\soundai\Asobo_VL3_AI.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\soundai\"
+	
+	;COPY ADD ON FILES
+	SetOutPath "$msfsDir\${AIRPLANEID}"
+	File /r "${SHDDIR}"
+
+	;COPY JSON GEN
+	SetOutPath "$msfsDir\"
+	File "${BLDDIR}\JSONgen\msfsJSONgen.exe"
+	Exec '"$msfsDir\msfsJSONgen.exe" "$msfsDir\${AIRPLANEID}"'
+
+	;RUN JSON GEN
+	SetOutPath "$msfsDir\"
+	File /r "${BLDDIR}\gauges\"
+	Exec '"$msfsDir\msfsJSONgen.exe" "$msfsDir\legacy-vcockpits-instruments"'
+	
+	;MISSING PCK WARNING
+	IfFileExists "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\Asobo_VL3.PC.PCK" +3 0
+	MessageBox MB_ICONEXCLAMATION \
+	"File $msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK does not exists. Aircraft sounds will not work.."
+
 SectionEnd
 
 Section /o "Update" sectionUpdate
@@ -103,7 +134,7 @@ Section /o "Update" sectionUpdate
 	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\*.*"
 	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\Soundai\*.*"
 	Delete "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\DG808S.air"
-	Delete "$msfsDir\${AIRPLANEID}_CVT_\"
+	RMDir /R "$msfsDir\${AIRPLANEID}_CVT_\"
 
 	;COPY ASOBOPCK
 	CopyFiles "$msfsDir\..\Official\OneStore\asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK" "$msfsDir\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"

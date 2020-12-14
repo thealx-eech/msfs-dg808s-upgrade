@@ -1,0 +1,434 @@
+{
+  "content": [
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_background.png",
+      "size": 11118,
+      "date": 132518464840000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_hundreds_needle.png",
+      "size": 755,
+      "date": 132518464840000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_kohlsman_knob.png",
+      "size": 1224,
+      "date": 132518464840000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_kohlsman_strip.png",
+      "size": 6552,
+      "date": 132518464860000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_kohlsman_strip_altimeter_kohlsman_strip_mask.png",
+      "size": 178,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_ten_thousands_needle.png",
+      "size": 4168,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/altimeter_altimeter_thousands_needle.png",
+      "size": 797,
+      "date": 132518464860000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/asi_asi_background.png",
+      "size": 9660,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/asi_asi_needle.png",
+      "size": 754,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/compass_compass_background.png",
+      "size": 5916,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/compass_compass_lubber_line.png",
+      "size": 399,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/compass_compass_shadow.png",
+      "size": 149,
+      "date": 132518464880000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/compass_compass_strip.png",
+      "size": 7611,
+      "date": 132518464900000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/compass_compass_strip_compass_mask.png",
+      "size": 197,
+      "date": 132518464900000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/DG808s_Panel_Gauges_1.png",
+      "size": 72661,
+      "date": 132518465040000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/DG808s_Panel_Gauges_2.png",
+      "size": 78667,
+      "date": 132518464980000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/electrical_buttons_electrical_buttons_background.png",
+      "size": 4313,
+      "date": 132518465040000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_1.css",
+      "size": 24270,
+      "date": 132518465080000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_1.html",
+      "size": 3221,
+      "date": 132518465080000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_1.js",
+      "size": 22428,
+      "date": 132521107740000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_2.css",
+      "size": 24629,
+      "date": 132521107760000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_2.html",
+      "size": 3093,
+      "date": 132521107760000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_2.js",
+      "size": 31533,
+      "date": 132521107780000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_3.css",
+      "size": 3727,
+      "date": 132521804400000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_3.html",
+      "size": 1209,
+      "date": 132521801420000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/gauges_dg808s_panel_3.js",
+      "size": 4562,
+      "date": 132521801340000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_go_in.png",
+      "size": 705,
+      "date": 132518465160000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_go_out.png",
+      "size": 734,
+      "date": 132518465160000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_down_in.png",
+      "size": 744,
+      "date": 132518465160000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_down_out.png",
+      "size": 791,
+      "date": 132518465160000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_left_in.png",
+      "size": 805,
+      "date": 132518465180000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_left_out.png",
+      "size": 846,
+      "date": 132518465180000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_right_in.png",
+      "size": 742,
+      "date": 132518465180000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_right_out.png",
+      "size": 776,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_up_in.png",
+      "size": 740,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_page_up_out.png",
+      "size": 782,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_power_in.png",
+      "size": 700,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_button_nav_display_power_out.png",
+      "size": 743,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/nav_display_nav_display_background.png",
+      "size": 14604,
+      "date": 132518465200000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/oat_oat_background.png",
+      "size": 455,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/oat_oat_line.png",
+      "size": 124,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/oat_oat_shadow.png",
+      "size": 130,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/oat_oat_strip.png",
+      "size": 1228,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/oat_oat_strip_oat_mask.png",
+      "size": 160,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_background.png",
+      "size": 9342,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_mode_in.png",
+      "size": 966,
+      "date": 132518465220000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_mode_out.png",
+      "size": 1041,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_squelch_in.png",
+      "size": 996,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_squelch_out.png",
+      "size": 1038,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_standby_in.png",
+      "size": 845,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_standby_out.png",
+      "size": 865,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_sto_in.png",
+      "size": 943,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_button_sto_out.png",
+      "size": 997,
+      "date": 132518465240000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/radio_radio_knob_power_and_volume.png",
+      "size": 471,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder _background.png",
+      "size": 7138,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_mode_in.png",
+      "size": 511,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_mode_out.png",
+      "size": 517,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_squelch_in.png",
+      "size": 490,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_squelch_out.png",
+      "size": 497,
+      "date": 132518465260000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_standby_in.png",
+      "size": 349,
+      "date": 132518465280000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_standby_out.png",
+      "size": 374,
+      "date": 132518465280000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_sto_in.png",
+      "size": 398,
+      "date": 132518465280000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/transponder_transponder_button_sto_out.png",
+      "size": 406,
+      "date": 132518465280000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/turn_bank_turn_bank_background.png",
+      "size": 5510,
+      "date": 132518465280000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/turn_bank_turn_bank_ball_overlay.png",
+      "size": 412,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/turn_bank_turn_bank_needle.png",
+      "size": 883,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/turn_bank_turn_bank_off_flag.png",
+      "size": 397,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_background.png",
+      "size": 7970,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_altitude.png",
+      "size": 279,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_averager.png",
+      "size": 325,
+      "date": 132518465320000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_average_decreasing.png",
+      "size": 195,
+      "date": 132518465300000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_average_increasing.png",
+      "size": 183,
+      "date": 132518465320000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_ballast_quantity.png",
+      "size": 312,
+      "date": 132518465320000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_circling_mode.png",
+      "size": 213,
+      "date": 132518465340000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_feet.png",
+      "size": 235,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_metres.png",
+      "size": 217,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_percent_symbol.png",
+      "size": 204,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_pull_slow_down.png",
+      "size": 247,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_label_push_speed_up.png",
+      "size": 242,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/variometer_variometer_needle.png",
+      "size": 866,
+      "date": 132518465360000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/vsi_vsi_background.png",
+      "size": 8541,
+      "date": 132518465380000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/vsi_vsi_needle.png",
+      "size": 324,
+      "date": 132518465380000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/yawstring-base.png",
+      "size": 1880,
+      "date": 132521094960000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/yawstring-section1.png",
+      "size": 4171,
+      "date": 132521091900000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/yawstring-section2.png",
+      "size": 4101,
+      "date": 132521091760000000
+    },
+    {
+      "path": "html_ui/Pages/VLivery/liveries/Legacy/dg808s_panel/yawstring-section3.png",
+      "size": 4172,
+      "date": 132521091720000000
+    }
+  ]
+}
