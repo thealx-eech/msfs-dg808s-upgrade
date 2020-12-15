@@ -23,6 +23,13 @@
   font-weight: normal;
   font-style: normal; }
 
+@font-face {
+  font-family: "Font-Medium";
+  src: url("/Fonts/Quartz.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+  
 gauges_dg808s_panel_2-element {
   width: 100%;
   height: 100%;
@@ -91,6 +98,23 @@ gauges_dg808s_panel_2-element #Mainframe #variometer {
 		transform: scale(calc(1 * 90 / 90), calc(1 * 90 / 90));
 		transform-origin: 0 0;
 }
+gauges_dg808s_panel_2-element .battery_required {
+		position: absolute;
+}
+gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_altitude_0 {
+		background: transparent;
+		position: absolute;
+		font-family: "Quartz";
+		color: #202020;
+		font-size: 12px;
+		text-align: right;
+		
+		width: 40px;
+		height: 13px;
+		left: calc(26.000px - 0px);
+		top: calc(24.000px - 0px);
+		transform-origin: 0px 0px;
+	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_altitude_0 {
 		background: transparent;
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_altitude.png");
@@ -117,6 +141,21 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_averager_1
 		height: 8px;
 		left: calc(16.000px - 0px);
 		top: calc(48.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_averager_1 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+		text-align: center;
+		font-family: "Quartz";
+		color: #202020;
+		font-size: 9px;
+		
+		width: 24px;
+		height: 10px;
+		left: calc(22.000px - 0px);
+		top: calc(56.000px - 0px);
 		transform-origin: 0px 0px;
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_average_increasing_2 {
@@ -154,7 +193,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_push_speed
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
-
+		display: none;
 		width: 11px;
 		height: 11px;
 		left: calc(39.000px - 0px);
@@ -168,7 +207,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_pull_slow_
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
-
+		display: none;
 		width: 11px;
 		height: 11px;
 		left: calc(39.000px - 0px);
@@ -182,6 +221,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_circling_m
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
+		display: none;
 
 		width: 9px;
 		height: 7px;
@@ -196,7 +236,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_ballast_qu
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
-
+		display: none;
 		width: 12px;
 		height: 6px;
 		left: calc(56.000px - 0px);
@@ -238,6 +278,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_metres_10 
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
+		display: none;
 
 		width: 7px;
 		height: 5px;

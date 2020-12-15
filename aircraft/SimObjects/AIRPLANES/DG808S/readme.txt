@@ -18,7 +18,7 @@ Automatic installer support two installation modes: Install (installed Flight Si
 4. Regadless selected option, find your MSFS Community folder (if you have problems with that - read this article https://www.flightsim.com/vbfs/content.php?21235-Finding-The-MSFS-2020-Community-Folder ). You can't install add-on in some other folder, or installer will be not able to find file Asobo_VL3.PC.PCK (you will need to copy it into \sound\ manually).
 5. Installation process will started, which includes:
 5.1 If Install selected, FSX files will be copied into Community folder
-5.2 "\sound\" and "\DG808S.air" deleted from aircraft folder
+5.2 "\sound\" and "\DG808S.air" deleted from aircraft folder, as well as "dg808s_CVT_" from Community
 5.3 Asobo_VL3.PC.PCK and Asobo_VL3_AI.PC.PCK copied from "\Official\OneStore\asobo-aircraft-vl3\" or "\Official\Steam\asobo-aircraft-vl3\" folder (depends on installed MSFS version)
 5.4 Add-on files extracted into aircraft folder
 5.5 msfsJSONgen.exe copied into Community folder
@@ -37,6 +37,8 @@ If you experience "Too long filename" error in installation process, or your Com
 Remove fuel right after game start if you don't need it, or increase amount from 50% to 100%.
 
 If you experience visual issues with yaw string, switch antialiasing settings from TAA to different one.
+
+If you want to disable vario tone, use Alt+A shortkey
 
 ---------------------
 

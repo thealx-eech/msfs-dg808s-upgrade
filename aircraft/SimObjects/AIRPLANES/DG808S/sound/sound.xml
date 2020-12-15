@@ -28,35 +28,34 @@
       <WwiseRTPC SimVar="YOKE Y POSITION" Units="PERCENT" Index="0" Derived="true" RTPCName="SIMVAR_YOKE_Y_POSITION_DERIVED"/>
     </Sound>
 
-<!-- vario_tone ######################################################################################################### --> 
-		<Sound WwiseEvent="STALL_WARNING" Wwisedata="false" FileName="vario_pos">
-			<WwiseRTPC SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="0" RTPCName="VERTICAL_SPEED"/> 
-			<PitchCurve SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="1">
-			  <Point SimValue="0.000" Output="1" />
-			  <Point SimValue="2000.000" Output="2" />
-			</PitchCurve>
-			<VolumeCurve SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="0">
-			  <Point SimValue="-1000" Output="0.0" />
-			  <Point SimValue="200" Output="0.0" />
-			  <Point SimValue="200.001" Output="2.5" />
-			  <Point SimValue="2000" Output="2.5" />
-			</VolumeCurve>
-		</Sound>	  
-		  
-		<Sound WwiseEvent="STALL_WARNING" Wwisedata="false" FileName="vario_neg">
-			<WwiseRTPC SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="0" RTPCName="VERTICAL_SPEED"/> 
-			<PitchCurve SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="1">
-			  <Point SimValue="-2000.000" Output="2" />
-			  <Point SimValue="0.000" Output="1" />
-			</PitchCurve>
-			<VolumeCurve SimVar="VERTICAL SPEED" Units="FEET PER MINUTE" Index="0">
-			  <Point SimValue="-2000" Output="0.5" />
-			  <Point SimValue="-200.001" Output="0.5" />
-			  <Point SimValue="-200" Output="0.0" />
-			  <Point SimValue="1000" Output="0" />
-			</VolumeCurve>
-		</Sound>
-	
+	<Sound WwiseEvent="STALL_WARNING" Wwisedata="false" FileName="vario_pos" LocalVar="VARIO_TONE">
+		<WwiseRTPC LocalVar="VARIO_TONE" RTPCName="VARIO_TONE"/> 
+		<PitchCurve LocalVar="VARIO_TONE">
+		  <Point SimValue="0.000" Output="1" />
+		  <Point SimValue="2000.000" Output="2" />
+		</PitchCurve>
+		<VolumeCurve LocalVar="VARIO_TONE">
+		  <Point SimValue="-1000" Output="0.0" />
+		  <Point SimValue="200" Output="0.0" />
+		  <Point SimValue="200.001" Output="2.5" />
+		  <Point SimValue="2000" Output="2.5" />
+		</VolumeCurve>
+	</Sound>
+
+	<Sound WwiseEvent="STALL_WARNING" Wwisedata="false" FileName="vario_neg" LocalVar="VARIO_TONE">
+		<WwiseRTPC LocalVar="VARIO_TONE" RTPCName="VARIO_TONE"/> 
+		<PitchCurve LocalVar="VARIO_TONE">
+		  <Point SimValue="-2000.000" Output="2" />
+		  <Point SimValue="0.000" Output="1" />
+		</PitchCurve>
+		<VolumeCurve LocalVar="VARIO_TONE">
+		  <Point SimValue="-2000" Output="0.5" />
+		  <Point SimValue="-200.001" Output="0.5" />
+		  <Point SimValue="-200" Output="0.0" />
+		  <Point SimValue="1000" Output="0" />
+		</VolumeCurve>
+	</Sound>
+
   </AlwaysPlaySounds>
 
 <!-- TriggerSounds ######################################################################################################### -->  

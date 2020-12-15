@@ -105,7 +105,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 1000 * 360 + 90)* Math.PI/180; /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 1000 / 360 * 90 + dgrd" */
 			var Minimum = 0;
 			var Maximum = 999999999;
-			var PointsTo = 90;
+			var PointsTo = 0;
 			transform += 'rotate(' + (ExpressionResult * 180 / Math.PI + PointsTo) + 'deg) ';
 		  }
 		  if (transform != '')

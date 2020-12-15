@@ -5,6 +5,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.curTime = 0.0;
         this.bNeedUpdate = false;
         this._isConnected = false;
+		this.lastCheck = 0;
+		this.climbValues = new Array(30);
     }
     get templateID() { return "gauges_dg808s_panel_2"; }
     connectedCallback() {
@@ -41,8 +43,32 @@ class gauges_dg808s_panel_2 extends TemplateElement {
          else if (!SimVar.GetSimVarValue("LIGHT TAXI", "bool") && gears_extracted)
             SimVar.SetSimVarValue("K:TOGGLE_TAXI_LIGHTS", "bool", true)
        }
+	   
+	   // VARIO TOTAL ENERGY reading = (h2 - h1) + ((v + a)2 - v2)/(2 * g)
+		var airspeed = SimVar.GetSimVarValue("AIRSPEED TRUE", "meters per second");
+		var acceleration = SimVar.GetSimVarValue("ACCELERATION BODY Z", "meters per second squared");
+		var verticalSpeed = SimVar.GetSimVarValue("VERTICAL SPEED", "meters per second");
+		var total_energy = verticalSpeed + (Math.pow(airspeed + acceleration, 2) - Math.pow(airspeed,2)) / (2 * 9.81);
 
+		SimVar.SetSimVarValue("L:TOTAL ENERGY", "meters per second", total_energy);
 
+		// VARIO TONE
+		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool"))
+			SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", total_energy * 196.85)
+		else
+			SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0)
+
+		// VARIO AVERAGE SINK
+		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && this.lastCheck != parseInt(SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds"))) {
+			this.lastCheck = parseInt(SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds"));
+			
+			this.climbValues.pop();
+			this.climbValues.unshift(total_energy * 1.94);
+		}
+
+		/* DISPLAY VARIO ELEMENTS */
+		this.querySelector(".battery_required").style.display = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? "block" : "none";
+		
 		/* ASI_ASI_NEEDLE_0 */
 		var asi_asi_needle_0 = this.querySelector("#asi_asi_needle_0");
 		if (typeof asi_asi_needle_0 !== "undefined") {
@@ -117,6 +143,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		}
 
+		var variometer_variometer_value_altitude_0 = this.querySelector("#variometer_variometer_value_altitude_0");
+		if (typeof variometer_variometer_value_altitude_0 !== "undefined") {
+			//variometer_variometer_value_altitude_0.innerHTML = SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet").toFixed(0);
+		}
+
+
 		/* VARIOMETER_VARIOMETER_LABEL_AVERAGER_1 */
 		var variometer_variometer_label_averager_1 = this.querySelector("#variometer_variometer_label_averager_1");
 		if (typeof variometer_variometer_label_averager_1 !== "undefined") {
@@ -127,24 +159,23 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		}
 
-		/* VARIOMETER_VARIOMETER_LABEL_AVERAGE_INCREASING_2 */
 		var variometer_variometer_label_average_increasing_2 = this.querySelector("#variometer_variometer_label_average_increasing_2");
-		if (typeof variometer_variometer_label_average_increasing_2 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_average_increasing_2.style.transform = transform; 
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_AVERAGE_DECREASING_3 */
 		var variometer_variometer_label_average_decreasing_3 = this.querySelector("#variometer_variometer_label_average_decreasing_3");
-		if (typeof variometer_variometer_label_average_decreasing_3 !== "undefined") {
-		  var transform = '';
+		var variometer_variometer_value_averager_1 = this.querySelector("#variometer_variometer_value_averager_1");
+		if (typeof variometer_variometer_value_averager_1 !== "undefined") {
+			var average = 0;
+			for (i = 0; i < this.climbValues.length; i++) {
+				if (typeof this.climbValues[i] !== "undefined") {
+					average += this.climbValues[i];
+				}
+			}
+			
+			average /= 30;
+			
+			variometer_variometer_label_average_increasing_2.style.display = average > 0.1 ? "block" : "none"; 
+			variometer_variometer_label_average_decreasing_3.style.display = average < 0.1 ? "block" : "none"; 
 
-		  if (transform != '')
-		    variometer_variometer_label_average_decreasing_3.style.transform = transform; 
-
+			variometer_variometer_value_averager_1.innerHTML = average.toFixed(1);
 		}
 
 		/* VARIOMETER_VARIOMETER_LABEL_PUSH_SPEED_UP_4 */
@@ -223,8 +254,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		  var transform = '';
 
 		  {
-
-			var ExpressionResult = SimVar.GetSimVarValue("VERTICAL SPEED", "feet per minute") / 101 + SimVar.GetSimVarValue("ACCELERATION WORLD Z", "feet per minute squared"); /* PARSED FROM "(A:Variometer rate, knots)" */
+			var ExpressionResult = 	SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? SimVar.GetSimVarValue("L:TOTAL ENERGY", "knots") : 0;
 			var Minimum = -10.000;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 10.000;
@@ -282,7 +312,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		  {
 
-			var ExpressionResult = (SimVar.GetSimVarValue("VERTICAL SPEED", "feet per minute")) * 0.00988; /* PARSED FROM "(A:Vertical speed,feet per minute) 0.00988 *" */
+			var ExpressionResult = SimVar.GetSimVarValue("L:TOTAL ENERGY", "knots");
 			var Minimum = -10.000;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 10.000;
@@ -710,7 +740,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		  nav_display_GaugeText_29.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 4 ) ? "block" : "none";
 
-			nav_display_GaugeText_29.innerHTML = "ET:" + Math.round( Math.floor(((SimVar.GetSimVarValue("E: ABSOLUTE TIME", "seconds")) - 0) / 3600) ).toString() + ":" + Math.round( Math.floor(((SimVar.GetSimVarValue("E: ABSOLUTE TIME", "seconds")) - 0) % 3600 / 60) ).toString() + ":" + Math.round( ((SimVar.GetSimVarValue("E: ABSOLUTE TIME", "seconds")) - 0) % 60 ).toString() ;
+			nav_display_GaugeText_29.innerHTML = "ET:" + Math.round( Math.floor(((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) / 3600) ).toString() + ":" + Math.round( Math.floor(((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) % 3600 / 60) ).toString() + ":" + Math.round( ((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) % 60 ).toString() ;
 
 		  if (transform != '')
 		    nav_display_GaugeText_29.style.transform = transform; 
