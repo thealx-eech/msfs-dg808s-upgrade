@@ -49,6 +49,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		var acceleration = SimVar.GetSimVarValue("ACCELERATION BODY Z", "meters per second squared");
 		var verticalSpeed = SimVar.GetSimVarValue("VERTICAL SPEED", "meters per second");
 		var total_energy = verticalSpeed + (Math.pow(airspeed + acceleration, 2) - Math.pow(airspeed,2)) / (2 * 9.81);
+		
+		// TE VALUE SMOOTHNESS
+		total_energy = 0.3 * total_energy + 0.7 * SimVar.GetSimVarValue("L:TOTAL ENERGY", "meters per second", total_energy);
 
 		SimVar.SetSimVarValue("L:TOTAL ENERGY", "meters per second", total_energy);
 
@@ -656,7 +659,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		  nav_display_GaugeText_23.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) ? "block" : "none";
 
-			nav_display_GaugeText_23.innerHTML = "EL:" + ( (SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 2 ) ?  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "feet")) :  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "meters")) ) ).toString() : "" )) + "SP:" + Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  (SimVar.GetSimVarValue("GPS GROUND SPEED", "knots")) :  (SimVar.GetSimVarValue("GPS GROUND SPEED", "kph")) ) ).toString() ;
+			nav_display_GaugeText_23.innerHTML = "EL:" + ( (SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 2 ) ?  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "feet")) :  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "meters")) ) ).toString() : "" )) + "SP:" + Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  (SimVar.GetSimVarValue("AIRSPEED INDICATED", "knots")) :  (SimVar.GetSimVarValue("AIRSPEED INDICATED", "kph")) ) ).toString() ;
 
 		  if (transform != '')
 		    nav_display_GaugeText_23.style.transform = transform; 
