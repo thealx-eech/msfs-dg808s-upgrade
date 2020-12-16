@@ -1,0 +1,114 @@
+/* CSS for altimeter */
+
+#altimeter {
+    position: absolute;
+    overflow: hidden;
+    left: 9px;
+    top: 11px;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/background.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    width: 103px;
+    height: 103px;
+
+    transform: scale(calc(1 * 109 / 103), calc(1 * 108 / 103));
+    transform-origin: 0 0;
+}
+
+#kohlsman_strip_0_mask {
+    background: transparent;
+    position: absolute;
+    overflow: hidden;
+
+    width: 14px;
+    height: 20px;
+    left: 87.000px;
+    top: 42.000px;
+}
+
+#kohlsman_strip_0_mask_image {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/kohlsman_strip_altimeter_kohlsman_strip_mask.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 100%;
+    height: 100%;
+}
+
+#kohlsman_strip_0 {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/kohlsman_strip.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 19px;
+    height: 214px;
+    left: -2.000px;
+    top: -0.000px;
+    transform-origin: 2.000px 0.000px;
+}
+
+#ten_thousands_needle_1 {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/ten_thousands_needle.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 58px;
+    height: 75px;
+    left: calc(57.000px - 28.000px);
+    top: calc(51.500px - 50.500px);
+    transform-origin: 28.000px 50.500px;
+}
+
+#thousands_needle_2 {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/thousands_needle.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 11px;
+    height: 40px;
+    left: calc(57.000px - 5.000px);
+    top: calc(51.500px - 26.500px);
+    transform-origin: 5.000px 26.500px;
+}
+
+#hundreds_needle_3 {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/hundreds_needle.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 66px;
+    height: 7px;
+    left: calc(57.000px - 45.000px);
+    top: calc(51.500px - 3.500px);
+    transform-origin: 45.000px 3.500px;
+}
+
+#kohlsman_knob_4 {
+    background: transparent;
+    background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/altimeter/kohlsman_knob.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    position: absolute;
+    overflow: hidden;
+
+    width: 24px;
+    height: 23px;
+    left: calc(0.000px - 0px);
+    top: calc(85.000px - 0px);
+    transform-origin: 0px 0px;
+}

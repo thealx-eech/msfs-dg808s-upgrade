@@ -1,4 +1,5 @@
 class gauges_dg808s_panel_1 extends TemplateElement {
+
     constructor() {
         super();
         this.location = "interior";
@@ -7,6 +8,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         this._isConnected = false;
     }
     get templateID() { return "gauges_dg808s_panel_1"; }
+
     connectedCallback() {
         super.connectedCallback();
         let parsedUrl = new URL(this.getAttribute("Url").toLowerCase());
@@ -19,11 +21,23 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         this._isConnected = true;
         requestAnimationFrame(updateLoop);
     }
+
     disconnectedCallback() {
     }
+
+    //*************************************************************************
+    //********** MSFS Update() Callback ***************************************
+    //*************************************************************************
     Update() {
-		this.updateInstruments();
+        this.update_altimeter();
+        this.update_turn_and_bank();
+        this.update_outside_air_temp();
+        this.update_electrical_buttons();
+        this.update_radio();
+        this.update_transponder();
+        this.update_compass();
     }
+
     /*playInstrumentSound(soundId) {
         if (this.isElectricityAvailable()) {
             Coherent.call("PLAY_INSTRUMENT_SOUND", soundId);
@@ -31,31 +45,25 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         }
         return false;
     }	*/
-    updateInstruments() {
 
-       // TAXI LIGHTS CONTROL
-       if (SimVar.GetSimVarValue("IS GEAR RETRACTABLE", "Boolean")) {
-         var gears_extracted = SimVar.GetSimVarValue("GEAR HANDLE POSITION", "Boolean");
-         if (SimVar.GetSimVarValue("LIGHT TAXI", "bool") && !gears_extracted)
-            SimVar.SetSimVarValue("K:TOGGLE_TAXI_LIGHTS", "bool", false)
-         else if (!SimVar.GetSimVarValue("LIGHT TAXI", "bool") && gears_extracted)
-            SimVar.SetSimVarValue("K:TOGGLE_TAXI_LIGHTS", "bool", true)
-       }
-
-
+    //***********************************************************************************
+    //***********  ALTIMETER  ***********************************************************
+    //***********************************************************************************
+    update_altimeter() {
 		/* ALTIMETER_ALTIMETER_KOHLSMAN_STRIP_0 */
 		var altimeter_altimeter_kohlsman_strip_0 = this.querySelector("#altimeter_altimeter_kohlsman_strip_0");
 		if (typeof altimeter_altimeter_kohlsman_strip_0 !== "undefined") {
 		  var transform = '';
 
 		  {
-			var ExpressionResult = ((SimVar.GetSimVarValue("KOHLSMAN SETTING HG", "inches of mercury")) - 28.1) * -197 / 3.4 + 0.8; /* PARSED FROM "(A:Kohlsman setting hg,inHg) 28.1 - -197 * 3.4 / 0.8 +" */
+            /* PARSED FROM "(A:Kohlsman setting hg,inHg) 28.1 - -197 * 3.4 / 0.8 +" */
+			var ExpressionResult = ((SimVar.GetSimVarValue("KOHLSMAN SETTING HG", "inches of mercury")) - 28.1) * -197 / 3.4 + 0.8;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			transform += 'translate(' + (ExpressionResult * 0) + 'px, ' + (ExpressionResult * 1) + 'px) ';
 		  }
 		  if (transform != '')
-		    altimeter_altimeter_kohlsman_strip_0.style.transform = transform; 
+		    altimeter_altimeter_kohlsman_strip_0.style.transform = transform;
 
 		}
 
@@ -65,15 +73,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-
-			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 100000 * 360)* Math.PI/180; /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 100000 / 360 * dgrd" */
+            /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 100000 / 360 * dgrd" */
+			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 100000 * 360)* Math.PI/180;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var PointsTo = 0;
 			transform += 'rotate(' + (ExpressionResult * 180 / Math.PI + PointsTo) + 'deg) ';
 		  }
 		  if (transform != '')
-		    altimeter_altimeter_ten_thousands_needle_1.style.transform = transform; 
+		    altimeter_altimeter_ten_thousands_needle_1.style.transform = transform;
 
 		}
 
@@ -83,15 +91,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-
-			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 10000 * 360)* Math.PI/180; /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 10000 / 360 * dgrd" */
+            /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 10000 / 360 * dgrd" */
+			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 10000 * 360)* Math.PI/180;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var PointsTo = 0;
 			transform += 'rotate(' + (ExpressionResult * 180 / Math.PI + PointsTo) + 'deg) ';
 		  }
 		  if (transform != '')
-		    altimeter_altimeter_thousands_needle_2.style.transform = transform; 
+		    altimeter_altimeter_thousands_needle_2.style.transform = transform;
 
 		}
 
@@ -101,15 +109,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-
-			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 1000 * 360 + 90)* Math.PI/180; /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 1000 / 360 * 90 + dgrd" */
+            /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 1000 / 360 * 90 + dgrd" */
+			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 1000 * 360 + 90)* Math.PI/180;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var PointsTo = 0;
 			transform += 'rotate(' + (ExpressionResult * 180 / Math.PI + PointsTo) + 'deg) ';
 		  }
 		  if (transform != '')
-		    altimeter_altimeter_hundreds_needle_3.style.transform = transform; 
+		    altimeter_altimeter_hundreds_needle_3.style.transform = transform;
 
 		}
 
@@ -119,10 +127,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    altimeter_altimeter_kohlsman_knob_4.style.transform = transform; 
+		    altimeter_altimeter_kohlsman_knob_4.style.transform = transform;
 
 		}
+    }
 
+    //***********************************************************************************
+    //***********  TURN AND BANK   ******************************************************
+    //***********************************************************************************
+    update_turn_and_bank() {
 		/* TURN_BANK_TURN_BANK_OFF_FLAG_0 */
 		var turn_bank_turn_bank_off_flag_0 = this.querySelector("#turn_bank_turn_bank_off_flag_0");
 		if (typeof turn_bank_turn_bank_off_flag_0 !== "undefined") {
@@ -131,7 +144,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  turn_bank_turn_bank_off_flag_0.style.display = !(!(1) * (SimVar.GetSimVarValue("TURN INDICATOR SWITCH", "boolean"))) ? "block" : "none";
 
 		  if (transform != '')
-		    turn_bank_turn_bank_off_flag_0.style.transform = transform; 
+		    turn_bank_turn_bank_off_flag_0.style.transform = transform;
 
 		}
 
@@ -141,7 +154,8 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-			var ExpressionResult = Math.min(30, Math.max(-30 , -(SimVar.GetSimVarValue("PLANE BANK DEGREES", "degree")))) / 30 * 100; /* PARSED FROM "(A:TURN COORDINATOR BALL,percent)" */
+             /* PARSED FROM "(A:TURN COORDINATOR BALL,percent)" */
+			var ExpressionResult = Math.min(30, Math.max(-30 , -(SimVar.GetSimVarValue("PLANE BANK DEGREES", "degree")))) / 30 * 100;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var NonlinearityTable = [
@@ -181,7 +195,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 
 		  }
 		  if (transform != '')
-		    turn_bank_turn_bank_ball_overlay_1.style.transform = transform; 
+		    turn_bank_turn_bank_ball_overlay_1.style.transform = transform;
 
 		}
 
@@ -191,8 +205,8 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-
-			var ExpressionResult = (-SimVar.GetSimVarValue("TURN INDICATOR RATE", "degree per second")) * 60 / 360 * 0.44 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")); /* PARSED FROM " (A:Delta Heading Rate, rpm) 0.44 * (A:ELECTRICAL MASTER BATTERY,bool) *" */
+            /* PARSED FROM " (A:Delta Heading Rate, rpm) 0.44 * (A:ELECTRICAL MASTER BATTERY,bool) *" */
+			var ExpressionResult = (-SimVar.GetSimVarValue("TURN INDICATOR RATE", "degree per second")) * 60 / 360 * 0.44 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean"));
 			var Minimum = -0.400;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 0.400;
@@ -201,23 +215,29 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			transform += 'rotate(' + (ExpressionResult * 180 / Math.PI + PointsTo) + 'deg) ';
 		  }
 		  if (transform != '')
-		    turn_bank_turn_bank_needle_2.style.transform = transform; 
+		    turn_bank_turn_bank_needle_2.style.transform = transform;
 
-		}
+        }
+    }
 
+    //***********************************************************************************
+    //***********  OUTSIDE AIR TEMP   ***************************************************
+    //***********************************************************************************
+    update_outside_air_temp() {
 		/* OAT_OAT_STRIP_0 */
 		var oat_oat_strip_0 = this.querySelector("#oat_oat_strip_0");
 		if (typeof oat_oat_strip_0 !== "undefined") {
 		  var transform = '';
 
 		  {
-			var ExpressionResult = (SimVar.GetSimVarValue("AMBIENT TEMPERATURE", "celsius")) / 75 * 243 - 150.5; /* PARSED FROM "(A:AMBIENT TEMPERATURE,Celsius) 75 / 243 * 150.5 -" */
+            /* PARSED FROM "(A:AMBIENT TEMPERATURE,Celsius) 75 / 243 * 150.5 -" */
+			var ExpressionResult = (SimVar.GetSimVarValue("AMBIENT TEMPERATURE", "celsius")) / 75 * 243 - 150.5;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			transform += 'translate(' + (ExpressionResult * 0) + 'px, ' + (ExpressionResult * 1) + 'px) ';
 		  }
 		  if (transform != '')
-		    oat_oat_strip_0.style.transform = transform; 
+		    oat_oat_strip_0.style.transform = transform;
 
 		}
 
@@ -227,7 +247,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    oat_oat_line_1.style.transform = transform; 
+		    oat_oat_line_1.style.transform = transform;
 
 		}
 
@@ -237,9 +257,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    oat_oat_shadow_2.style.transform = transform; 
+		    oat_oat_shadow_2.style.transform = transform;
 
 		}
+    }
+
+    //***********************************************************************************
+    //***********  ELECTRICAL BUTTONS   *************************************************
+    //***********************************************************************************
+    update_electrical_buttons() {
 
 		/* ELECTRICAL_BUTTONS_VARIO_0 */
 		var electrical_buttons_VARIO_0 = this.querySelector("#electrical_buttons_VARIO_0");
@@ -247,7 +273,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    electrical_buttons_VARIO_0.style.transform = transform; 
+		    electrical_buttons_VARIO_0.style.transform = transform;
 
 		}
 
@@ -257,7 +283,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    electrical_buttons_GYRO_1.style.transform = transform; 
+		    electrical_buttons_GYRO_1.style.transform = transform;
 
 		}
 
@@ -267,17 +293,22 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    electrical_buttons_AVCS_2.style.transform = transform; 
+		    electrical_buttons_AVCS_2.style.transform = transform;
 
 		}
+    }
 
+    //***********************************************************************************
+    //***********  RADIO    *************************************************************
+    //***********************************************************************************
+    update_radio() {
 		/* RADIO_RADIO_KNOB_POWER_AND_VOLUME_0 */
 		var radio_radio_knob_power_and_volume_0 = this.querySelector("#radio_radio_knob_power_and_volume_0");
 		if (typeof radio_radio_knob_power_and_volume_0 !== "undefined") {
 		  var transform = '';
 
 		  if (transform != '')
-		    radio_radio_knob_power_and_volume_0.style.transform = transform; 
+		    radio_radio_knob_power_and_volume_0.style.transform = transform;
 
 		}
 
@@ -287,7 +318,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    radio_radio_button_standby_out_1.style.transform = transform; 
+		    radio_radio_button_standby_out_1.style.transform = transform;
 
 		}
 
@@ -299,7 +330,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  radio_radio_button_standby_in_2.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    radio_radio_button_standby_in_2.style.transform = transform; 
+		    radio_radio_button_standby_in_2.style.transform = transform;
 
 		}
 
@@ -309,7 +340,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    radio_radio_button_mode_out_3.style.transform = transform; 
+		    radio_radio_button_mode_out_3.style.transform = transform;
 
 		}
 
@@ -321,7 +352,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  radio_radio_button_mode_in_4.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    radio_radio_button_mode_in_4.style.transform = transform; 
+		    radio_radio_button_mode_in_4.style.transform = transform;
 
 		}
 
@@ -331,7 +362,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    radio_radio_button_squelch_out_5.style.transform = transform; 
+		    radio_radio_button_squelch_out_5.style.transform = transform;
 
 		}
 
@@ -343,7 +374,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  radio_radio_button_squelch_in_6.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    radio_radio_button_squelch_in_6.style.transform = transform; 
+		    radio_radio_button_squelch_in_6.style.transform = transform;
 
 		}
 
@@ -353,7 +384,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    radio_radio_button_sto_out_7.style.transform = transform; 
+		    radio_radio_button_sto_out_7.style.transform = transform;
 
 		}
 
@@ -365,7 +396,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  radio_radio_button_sto_in_8.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    radio_radio_button_sto_in_8.style.transform = transform; 
+		    radio_radio_button_sto_in_8.style.transform = transform;
 
 		}
 
@@ -379,7 +410,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			radio_Transmission_Indication_9.innerHTML = "<";
 
 		  if (transform != '')
-		    radio_Transmission_Indication_9.style.transform = transform; 
+		    radio_Transmission_Indication_9.style.transform = transform;
 
 		}
 
@@ -393,7 +424,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			radio_Active_Frequency_10.innerHTML = ( (SimVar.GetSimVarValue("COM ACTIVE FREQUENCY:1", "MHz")) ).toFixed(2).toString() ;
 
 		  if (transform != '')
-		    radio_Active_Frequency_10.style.transform = transform; 
+		    radio_Active_Frequency_10.style.transform = transform;
 
 		}
 
@@ -407,17 +438,22 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			radio_Standby_Frequency_11.innerHTML = ( (SimVar.GetSimVarValue("COM STANDBY FREQUENCY:1", "MHz")) ).toFixed(2).toString() ;
 
 		  if (transform != '')
-		    radio_Standby_Frequency_11.style.transform = transform; 
+		    radio_Standby_Frequency_11.style.transform = transform;
 
 		}
+    }
 
+    //***********************************************************************************
+    //***********  TRANSPONDER  *********************************************************
+    //***********************************************************************************
+    update_transponder() {
 		/* TRANSPONDER_TRANSPONDER_BUTTON_STANDBY_OUT_0 */
 		var transponder_transponder_button_standby_out_0 = this.querySelector("#transponder_transponder_button_standby_out_0");
 		if (typeof transponder_transponder_button_standby_out_0 !== "undefined") {
 		  var transform = '';
 
 		  if (transform != '')
-		    transponder_transponder_button_standby_out_0.style.transform = transform; 
+		    transponder_transponder_button_standby_out_0.style.transform = transform;
 
 		}
 
@@ -429,7 +465,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  transponder_transponder_button_standby_in_1.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    transponder_transponder_button_standby_in_1.style.transform = transform; 
+		    transponder_transponder_button_standby_in_1.style.transform = transform;
 
 		}
 
@@ -439,7 +475,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    transponder_transponder_button_mode_out_2.style.transform = transform; 
+		    transponder_transponder_button_mode_out_2.style.transform = transform;
 
 		}
 
@@ -451,7 +487,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  transponder_transponder_button_mode_in_3.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    transponder_transponder_button_mode_in_3.style.transform = transform; 
+		    transponder_transponder_button_mode_in_3.style.transform = transform;
 
 		}
 
@@ -461,7 +497,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    transponder_transponder_button_squelch_out_4.style.transform = transform; 
+		    transponder_transponder_button_squelch_out_4.style.transform = transform;
 
 		}
 
@@ -473,7 +509,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  transponder_transponder_button_squelch_in_5.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    transponder_transponder_button_squelch_in_5.style.transform = transform; 
+		    transponder_transponder_button_squelch_in_5.style.transform = transform;
 
 		}
 
@@ -483,7 +519,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    transponder_transponder_button_sto_out_6.style.transform = transform; 
+		    transponder_transponder_button_sto_out_6.style.transform = transform;
 
 		}
 
@@ -495,7 +531,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  transponder_transponder_button_sto_in_7.style.display = 0 ? "block" : "none";
 
 		  if (transform != '')
-		    transponder_transponder_button_sto_in_7.style.transform = transform; 
+		    transponder_transponder_button_sto_in_7.style.transform = transform;
 
 		}
 
@@ -509,7 +545,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			transponder_Transponder_Code_8.innerHTML = ( 0 ).toString() + "(l0 12 >> 15 &)%!d!" + Math.round( 0 ).toString() + "(l0 4 >> 15 &)%!d!" + Math.round( 0 ).toString() ;
 
 		  if (transform != '')
-		    transponder_Transponder_Code_8.style.transform = transform; 
+		    transponder_Transponder_Code_8.style.transform = transform;
 
 		}
 
@@ -523,9 +559,15 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 			transponder_Mode_C_Altitude_Display_9.innerHTML = "F" + Math.round( Math.round(( ( 1 == 2 ) ?  3.048 :  10 ) * ((SimVar.GetSimVarValue("PLANE ALTITUDE", "feet")) / 1000 - (SimVar.GetSimVarValue("SEA LEVEL PRESSURE", "inhg")) + 29.92)) ).toString() ;
 
 		  if (transform != '')
-		    transponder_Mode_C_Altitude_Display_9.style.transform = transform; 
+		    transponder_Mode_C_Altitude_Display_9.style.transform = transform;
 
 		}
+    }
+
+    //***********************************************************************************
+    //***********  COMPASS      *********************************************************
+    //***********************************************************************************
+    update_compass() {
 
 		/* COMPASS_COMPASS_STRIP_0 */
 		var compass_compass_strip_0 = this.querySelector("#compass_compass_strip_0");
@@ -533,13 +575,14 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  {
-			var ExpressionResult = (SimVar.GetSimVarValue("PLANE HEADING DEGREES MAGNETIC", "degrees")) * 244 / 360 - 269; /* PARSED FROM "(A:Wiskey compass indication degrees,degrees) dnor 244 * 360 / 269 -" */
+            /* PARSED FROM "(A:Wiskey compass indication degrees,degrees) dnor 244 * 360 / 269 -" */
+			var ExpressionResult = (SimVar.GetSimVarValue("PLANE HEADING DEGREES MAGNETIC", "degrees")) * 244 / 360 - 269;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			transform += 'translate(' + (ExpressionResult * 1) + 'px, ' + (ExpressionResult * 0) + 'px) ';
 		  }
 		  if (transform != '')
-		    compass_compass_strip_0.style.transform = transform; 
+		    compass_compass_strip_0.style.transform = transform;
 
 		}
 
@@ -549,7 +592,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    compass_compass_shadow_1.style.transform = transform; 
+		    compass_compass_shadow_1.style.transform = transform;
 
 		}
 
@@ -559,7 +602,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    compass_compass_highlight_2.style.transform = transform; 
+		    compass_compass_highlight_2.style.transform = transform;
 
 		}
 
@@ -569,10 +612,11 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  var transform = '';
 
 		  if (transform != '')
-		    compass_compass_lubber_line_3.style.transform = transform; 
+		    compass_compass_lubber_line_3.style.transform = transform;
 
 		}
-
     }
+
 }
+
 registerLivery("gauges_dg808s_panel_1-element", gauges_dg808s_panel_1);

@@ -158,7 +158,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		    variometer_variometer_label_averager_1.style.transform = transform; 
 
 		}
-
+		
 		var variometer_variometer_label_average_increasing_2 = this.querySelector("#variometer_variometer_label_average_increasing_2");
 		var variometer_variometer_label_average_decreasing_3 = this.querySelector("#variometer_variometer_label_average_decreasing_3");
 		var variometer_variometer_value_averager_1 = this.querySelector("#variometer_variometer_value_averager_1");
@@ -312,7 +312,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		  {
 
-			var ExpressionResult = SimVar.GetSimVarValue("L:TOTAL ENERGY", "knots");
+			var ExpressionResult = SimVar.GetSimVarValue("L:TOTAL ENERGY", "knots"); /* PARSED FROM "(A:Vertical speed,feet per minute) 0.00988 *" */
 			var Minimum = -10.000;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 10.000;
