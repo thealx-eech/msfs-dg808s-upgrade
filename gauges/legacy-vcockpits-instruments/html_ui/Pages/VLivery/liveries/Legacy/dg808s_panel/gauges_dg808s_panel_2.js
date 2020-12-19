@@ -79,7 +79,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		  {
 
-			var ExpressionResult = (SimVar.GetSimVarValue("AIRSPEED TRUE", "knots")); /* PARSED FROM "(A:Airspeed select indicated or true,knots)" */
+			var ExpressionResult = (SimVar.GetSimVarValue("AIRSPEED INDICATED", "knots")); /* PARSED FROM "(A:Airspeed select indicated or true,knots)" */
 			var Minimum = 0.000;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 160.000;

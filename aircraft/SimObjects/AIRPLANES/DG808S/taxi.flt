@@ -6,13 +6,13 @@ bvelbodyaxis = 0 ;
 hvelbodyaxis = 0 ; 
 xvelbodyaxis = 0 ; 
 yvelbodyaxis = 0 ; 
-zvelbodyaxis = 0 ; 
+zvelbodyaxis = 97.5 ; 
 simonground = False ; 
 
 [Controls.0]
 
 SpoilersHandle=000.00
-FlapsHandle=028.57
+FlapsHandle=050.00
 LeftFlap=000.00
 RightFlap=000.00
 GearsHandle=000.00

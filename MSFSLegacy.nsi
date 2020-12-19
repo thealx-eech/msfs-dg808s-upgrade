@@ -13,7 +13,7 @@
 	
   !define AIRPLANEID "dg808s"
   !define FSXAIRPLANEID "DG808S"
-  !define VERSION "0.4"
+  !define VERSION "0.5"
   !define BLDDIR "J:\MSFS2020\MSFS MODS\DG808S\"
   !define SHDDIR "${BLDDIR}aircraft\"
 
