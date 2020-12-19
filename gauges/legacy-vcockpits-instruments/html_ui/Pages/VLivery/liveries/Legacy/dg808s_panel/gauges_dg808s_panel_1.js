@@ -50,6 +50,9 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********  ALTIMETER  ***********************************************************
     //***********************************************************************************
     update_altimeter() {
+
+        let altitude_feet = SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet");
+
 		/* ALTIMETER_ALTIMETER_KOHLSMAN_STRIP_0 */
 		var altimeter_altimeter_kohlsman_strip_0 = this.querySelector("#altimeter_altimeter_kohlsman_strip_0");
 		if (typeof altimeter_altimeter_kohlsman_strip_0 !== "undefined") {
@@ -74,7 +77,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 
 		  {
             /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 100000 / 360 * dgrd" */
-			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 100000 * 360)* Math.PI/180;
+            var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 100000 * 360)* Math.PI/180;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var PointsTo = 0;
@@ -92,7 +95,8 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 
 		  {
             /* PARSED FROM "(P:Units of measure, enum) 2 == if{ (A:Indicated Altitude, meters) } els{ (A:Indicated Altitude, feet) } 10000 / 360 * dgrd" */
-			var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 10000 * 360)* Math.PI/180;
+			//var ExpressionResult = (( ( 1 == 2 ) ?  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "meters")) :  (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet")) ) / 10000 * 360)* Math.PI/180;
+            var ExpressionResult  = altitude_feet / 10000 * 360 * Math.PI/180;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var PointsTo = 0;
