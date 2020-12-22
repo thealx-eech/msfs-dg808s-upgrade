@@ -3,6 +3,11 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     constructor() {
         super();
+        // Constants
+        this.MS_TO_KT = 1.94384; // speed conversion consts
+        this.MS_TO_KPH = 3.6;
+        this.MS_TO_FPS = 3.28084;
+
         this.location = "interior";
         this.curTime = 0.0;
         this.bNeedUpdate = false;
@@ -11,12 +16,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.climbValues = new Array(30);
 
         // Total Energy vars
-        this.previous_altitude_m = null;
-        this.previous_airspeed_ms = null;
+        this.time_s = null;
+        this.vertical_speed_ms = 0;
+        this.airspeed_ms = 0;
+        this.previous_airspeed_ms = 0;
         this.previous_time_s = null;
-        this.previous_te_ms = null;
+        this.te_raw_ms = 0;
+        this.previous_te_ms = 0;
 
         // Debug refresh timer and smoothed flight parameters
+        this.debug_enabled = true;
         this.debug_update_time = null;
         this.debug_glide_ratio = 50;
         this.debug_te_ms = 0;
@@ -58,8 +67,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     Update() {
         this.update_winter_vario();
         this.updateInstruments();
-        //this.update_winter_vario();
+        this.update_debug();
     }
+
     /*playInstrumentSound(soundId) {
         if (this.isElectricityAvailable()) {
             Coherent.call("PLAY_INSTRUMENT_SOUND", soundId);
@@ -72,127 +82,36 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Return TOTAL ENERGY climb rate in meters per second
     // ************************************************************
     get_total_energy_ms() {
-        let MS_TO_KT = 1.94384; // speed conversion consts
-        let MS_TO_KPH = 3.6;
-        /*
-        (A:AIRSPEED TRUE, meters per second) d *
-			 	19.62 /
-				(A:PLANE ALTITUDE, meters) +
-				0.25 * (G:Var3) 0.75 * +
-				d (G:Var3) -
-				(E:ABSOLUTE TIME, seconds)
-				0.25 * (G:Var2) 0.75 * +
-				d (G:Var2) -
-				r (&gt;G:Var2)
-				/
-				r (&gt;G:Var3)
-                0.05 * (G:Var4) 0.95 * + d (&gt;G:Var4)</Value>
-        */
-        let airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED TRUE", "meters per second");
-
-        let altitude_m = SimVar.GetSimVarValue("A:PLANE ALTITUDE", "meters");
-        let time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
+        this.airspeed_ms = SimVar.GetSimVarValue("A:VELOCITY BODY Z", "feet per second") / this.MS_TO_FPS;
+        this.vertical_speed_ms = SimVar.GetSimVarValue("A:VELOCITY WORLD Y", "feet per second") / this.MS_TO_FPS;
+        this.time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
         let g = 9.81; // Gravitational constant
-
-        //For flight model testing
-        let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
 
         // Detect startup and return 0
         if (this.previous_time_s == null) {
-            this.previous_airspeed_ms = airspeed_ms;
-            this.previous_altitude_m = altitude_m;
-            this.previous_time_s = time_s;
+            this.previous_airspeed_ms = this.airspeed_ms;
+            this.previous_time_s = this.time_s;
             this.previous_te_ms = 0.0;
-            // debug update time
-            this.debug_update_time = time_s;
-            // Just fake the very first TE reading, will increment from here.
+            // Make initial TE reading zero, will increment from here.
             return 0.0;
         }
 
-        let time_s_delta = time_s - this.previous_time_s;
+        let time_s_delta = this.time_s - this.previous_time_s;
         // Avoid a bad reading or divide-by-zero if this frame is ~same as previous
         if (time_s_delta < 0.0001) {
             return this.previous_te_ms;
         }
 
-        let altitude_m_delta = altitude_m - this.previous_altitude_m;
-        let airspeed_ms_squared_delta = airspeed_ms**2 - this.previous_airspeed_ms**2;
-        let vsi_ms = altitude_m_delta / time_s_delta;
+        let airspeed_ms_squared_delta = this.airspeed_ms**2 - this.previous_airspeed_ms**2;
         let te_compensation_ms = airspeed_ms_squared_delta / (2 * g * time_s_delta);
-        //let te_ms = (altitude_m_delta + airspeed_ms_squared_delta/(2*g)) / time_s_delta;
-        let te_ms_raw = vsi_ms + te_compensation_ms;
+        this.te_raw_ms = this.vertical_speed_ms + te_compensation_ms;
 
         // smoothing TE
-        let te_ms = 0.92 * this.previous_te_ms + 0.08 * te_ms_raw;
-
-        // Debug display properties (heavily smoothed)
-        this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * airspeed_ms;
-        this.debug_te_ms = 0.98 * this.debug_te_ms + 0.02 * te_ms_raw;
-        // Guard against divide by zero and irrelevant high L/D in lift
-        let glide_ratio = te_ms < -0.1 ? -airspeed_ms / te_ms : 99;
-        this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
-
-        /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
-        if (time_s - this.debug_update_time > 2) {
-            this.debug_update_time = time_s;
-            // DEBUG GLIDE RATIO (max 99)
-            var debug_el = this.querySelector("#nav_display_GaugeText_12");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "8px";
-                debug_el.style.top = "26px";
-                debug_el.style.height = "30px";
-                debug_el.style.width = "36px";
-                debug_el.style["text-align"] = "right";
-                debug_el.style.color = this.debug_glide_ratio == 99 ? "pink" :"black";
-                debug_el.innerHTML = Math.floor(this.debug_glide_ratio + 0.5);
-            }
-            // DEBUG AIRSPEED KPH
-            debug_el = this.querySelector("#nav_display_GaugeText_13");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "34px";
-                debug_el.style.left = "48px";
-                debug_el.style.top = "18px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "36px";
-                debug_el.style.width = "60px";
-                debug_el.style["text-align"] = "right";
-                debug_el.innerHTML = Math.floor(this.debug_airspeed_ms * MS_TO_KPH + 0.5);
-            }
-            // DEBUG FLAPS INDEX
-            debug_el = this.querySelector("#nav_display_GaugeText_14");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "8px";
-                debug_el.style.top = "60px";
-                debug_el.style.color = "blue";
-                debug_el.style.height = "30px";
-                //debug_el.style["font-family"] = "Roboto-Regular";
-                debug_el.innerHTML = ""+flaps_index;
-            }
-            // DEBUG TOTAL ENERGY SINK
-            debug_el = this.querySelector("#nav_display_GaugeText_19");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "28px";
-                debug_el.style.top = "55px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "36px";
-                debug_el.style.width = "76px";
-                debug_el.style["text-align"] = "right";
-                let te = this.debug_te_ms; // to shorten next line
-                debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
-            }
-        }
+        let te_ms = 0.92 * this.previous_te_ms + 0.08 * this.te_raw_ms;
 
         // OK we've calculated te_ms, so can store the current time/speed/height for the next update
-        this.previous_airspeed_ms = airspeed_ms;
-        this.previous_altitude_m = altitude_m;
-        this.previous_time_s = time_s;
+        this.previous_airspeed_ms = this.airspeed_ms;
+        this.previous_time_s = this.time_s;
         this.previous_te_ms = te_ms;
 
         return te_ms;
@@ -219,6 +138,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		}
     }
 
+    //******************************************************************************
+    //************** NAV INSTRUMENT     ********************************************
+    //******************************************************************************
     update_nav(){
 
 		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_GO_OUT_0 */
@@ -879,5 +801,132 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		}
     }
+
+    // ***********************************************************************************************************
+    // ********** DEBUG              *****************************************************************************
+    // ***********************************************************************************************************
+
+    update_debug() {
+        if (this.debug_update_time == null) {
+            this.debug_update_time = this.time_s;
+        }
+        // Debug display properties (heavily smoothed)
+        this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * this.airspeed_ms;
+        this.debug_te_ms = 0.98 * this.debug_te_ms + 0.02 * this.te_raw_ms;
+        // Guard against divide by zero and irrelevant high L/D in lift
+        let glide_ratio = this.te_raw_ms < -0.1 ? -this.airspeed_ms / this.te_raw_ms : 99;
+        this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
+
+        // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
+        let debug_enable = SimVar.GetSimVarValue("A:LIGHT LANDING","bool") ? true : false;
+
+        if (debug_enable) {
+            this.debug_enabled = true;
+        } else {
+            if (this.debug_enabled) {
+                this.debug_enabled = false;
+                this.debug_clear();
+            }
+            return;
+        }
+        /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
+        if (this.time_s - this.debug_update_time > 2) {
+            this.debug_update_time = this.time_s;
+            // DEBUG GLIDE RATIO (max 99)
+            var debug_el = this.querySelector("#nav_display_GaugeText_12");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.left = "8px";
+                debug_el.style.top = "26px";
+                debug_el.style.height = "30px";
+                debug_el.style.width = "36px";
+                debug_el.style["text-align"] = "right";
+                debug_el.style.color = this.debug_glide_ratio == 99 ? "pink" :"black";
+                debug_el.innerHTML = Math.floor(this.debug_glide_ratio + 0.5);
+            }
+            // DEBUG AIRSPEED KPH
+            debug_el = this.querySelector("#nav_display_GaugeText_13");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "34px";
+                debug_el.style.left = "48px";
+                debug_el.style.top = "18px";
+                debug_el.style.color = "white";
+                debug_el.style.height = "36px";
+                debug_el.style.width = "60px";
+                debug_el.style["text-align"] = "right";
+                debug_el.innerHTML = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
+            }
+            // DEBUG FLAPS INDEX
+            //For flight model testing
+            let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
+            debug_el = this.querySelector("#nav_display_GaugeText_14");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.left = "8px";
+                debug_el.style.top = "60px";
+                debug_el.style.color = "blue";
+                debug_el.style.height = "30px";
+                //debug_el.style["font-family"] = "Roboto-Regular";
+                debug_el.innerHTML = ""+flaps_index;
+            }
+            // DEBUG TOTAL ENERGY SINK
+            debug_el = this.querySelector("#nav_display_GaugeText_19");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.left = "28px";
+                debug_el.style.top = "55px";
+                debug_el.style.color = "white";
+                debug_el.style.height = "36px";
+                debug_el.style.width = "76px";
+                debug_el.style["text-align"] = "right";
+                let te = this.debug_te_ms; // to shorten next line
+                debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
+            }
+            // DEBUG ASI
+            debug_el = this.querySelector("#debug_asi_1");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style.width = "80px";
+                debug_el.innerHTML = Math.floor(this.time_s % 10); //"ABCD";
+            }
+            let jet_thrust = SimVar.GetSimVarValue("A:GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
+            debug_el = this.querySelector("#debug_asi_2");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.innerHTML = ""+jet_thrust.toFixed(1);
+            }
+        }
+    } // end update_debug
+
+    debug_clear() {
+        var debug_el = this.querySelector("#nav_display_GaugeText_12");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#nav_display_GaugeText_13");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#nav_display_GaugeText_14");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#nav_display_GaugeText_19");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#debug_asi_1");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#debug_asi_2");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+    } // end debug_clear
 }
 registerLivery("gauges_dg808s_panel_2-element", gauges_dg808s_panel_2);

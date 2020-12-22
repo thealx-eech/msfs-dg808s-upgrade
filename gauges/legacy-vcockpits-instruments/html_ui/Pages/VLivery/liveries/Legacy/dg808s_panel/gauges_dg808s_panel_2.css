@@ -29,7 +29,7 @@
   font-weight: normal;
   font-style: normal; }
 
-  
+
 gauges_dg808s_panel_2-element {
   width: 100%;
   height: 100%;
@@ -48,7 +48,7 @@ gauges_dg808s_panel_2-element {
 	height: 100%;
 	background: transparent;
   }
-	
+
     gauges_dg808s_panel_2-element #Mainframe #background {
       width: 100%;
       height: 100%;
@@ -108,7 +108,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_altitude_0
 		color: #202020;
 		font-size: 12px;
 		text-align: right;
-		
+
 		width: 40px;
 		height: 13px;
 		left: calc(26.000px - 0px);
@@ -151,7 +151,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_averager_1
 		font-family: "Quartz";
 		color: #202020;
 		font-size: 9px;
-		
+
 		width: 24px;
 		height: 10px;
 		left: calc(22.000px - 0px);
@@ -882,3 +882,18 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_29 {
 		vertical-align: CENTER;
 	}
 
+.b21_debug {
+    display: none; /* will be enabled in JS as needed */
+   /* background: transparent;
+    position: absolute;
+    overflow: hidden;
+    */
+    font-size: 20px;
+    font-family: "Quartz";
+    color: white;
+    height: 24px;
+    margin-bottom: 2px;
+    width: 100px;
+    text-align: right;
+    vertical-align: center;
+}
