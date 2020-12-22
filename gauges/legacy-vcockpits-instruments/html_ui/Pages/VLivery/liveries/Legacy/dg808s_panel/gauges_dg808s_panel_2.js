@@ -25,7 +25,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.previous_te_ms = 0;
 
         // Debug refresh timer and smoothed flight parameters
-        this.debug_enabled = true;
+        this.debug_enabled = false;
         this.debug_update_time = null;
         this.debug_glide_ratio = 50;
         this.debug_te_ms = 0;
@@ -818,7 +818,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
 
         // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
-        let debug_enable = SimVar.GetSimVarValue("A:LIGHT LANDING","bool") ? true : false;
+        let debug_enable = SimVar.GetSimVarValue("A:LIGHT CABIN","bool") ? true : false;
 
         if (debug_enable) {
             this.debug_enabled = true;
