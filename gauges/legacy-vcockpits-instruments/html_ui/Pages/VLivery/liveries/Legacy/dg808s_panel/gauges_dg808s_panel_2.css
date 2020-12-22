@@ -24,7 +24,7 @@
   font-style: normal; }
 
 @font-face {
-  font-family: "Font-Medium";
+  font-family: "Quartz";
   src: url("/Fonts/Quartz.ttf") format("truetype");
   font-weight: normal;
   font-style: normal; }
@@ -889,7 +889,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_29 {
     overflow: hidden;
     */
     font-size: 20px;
-    font-family: "Quartz";
+    font-family: "Font-Bold";
     color: white;
     height: 24px;
     margin-bottom: 2px;

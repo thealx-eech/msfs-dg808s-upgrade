@@ -12,7 +12,7 @@ simonground = True ;
 [CONTROLS.0]
 
 spoilershandle = 000.00 ; 
-flapshandle = 050.00 ; 
+flapshandle = 066.67 ; 
 leftflap = 024.24 ; 
 rightflap = 024.24 ; 
 gearshandle = 100.00 ; 
