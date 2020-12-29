@@ -66,6 +66,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     Update() {
         this.update_winter_vario();
+        this.update_vario_tone();
         this.updateInstruments();
         this.update_debug();
     }
@@ -114,7 +115,21 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.previous_time_s = this.time_s;
         this.previous_te_ms = te_ms;
 
+        SimVar.SetSimVarValue("L:TOTAL ENERGY", "meters per second", te_ms);
+
         return te_ms;
+    }
+
+    //******************************************************************************
+    //************** VARIO TONE       **********************************************
+    //******************************************************************************
+    update_vario_tone() {
+    	// VARIO TONE
+		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool"))
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", this.te_raw_ms * 196.85)
+        else
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0)
+
     }
 
     //******************************************************************************
@@ -545,14 +560,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		var acceleration = SimVar.GetSimVarValue("ACCELERATION BODY Z", "meters per second squared");
 		var verticalSpeed = SimVar.GetSimVarValue("VERTICAL SPEED", "meters per second");
 		var total_energy = verticalSpeed + (Math.pow(airspeed + acceleration, 2) - Math.pow(airspeed,2)) / (2 * 9.81);
-
-		SimVar.SetSimVarValue("L:TOTAL ENERGY", "meters per second", total_energy);
-
-		// VARIO TONE
-		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool"))
-			SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", total_energy * 196.85)
-		else
-			SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0)
 
 		// VARIO AVERAGE SINK
 		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && this.lastCheck != parseInt(SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds"))) {
