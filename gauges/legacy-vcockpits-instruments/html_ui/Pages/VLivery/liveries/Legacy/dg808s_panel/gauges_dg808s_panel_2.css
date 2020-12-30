@@ -61,7 +61,7 @@ gauges_dg808s_panel_2-element #Mainframe #asi {
 		overflow: hidden;
 		left: 10px;
 		top: 13px;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi_asi_background.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi/asi_asi_background.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		width: 103px;
@@ -72,7 +72,7 @@ gauges_dg808s_panel_2-element #Mainframe #asi {
 }
 gauges_dg808s_panel_2-element #Mainframe #asi_asi_needle_0 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi_asi_needle.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi/asi_asi_needle.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -89,7 +89,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer {
 		overflow: hidden;
 		left: 14px;
 		top: 152px;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_background.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_background.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		width: 90px;
@@ -117,7 +117,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_altitude_0
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_altitude_0 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_altitude.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_altitude.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -131,7 +131,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_altitude_0
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_averager_1 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_averager.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_averager.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -160,7 +160,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_value_averager_1
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_average_increasing_2 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_average_increasing.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_average_increasing.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -174,7 +174,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_average_in
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_average_decreasing_3 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_average_decreasing.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_average_decreasing.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -188,7 +188,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_average_de
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_push_speed_up_4 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_push_speed_up.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_push_speed_up.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -202,7 +202,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_push_speed
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_pull_slow_down_5 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_pull_slow_down.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_pull_slow_down.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -216,7 +216,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_pull_slow_
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_circling_mode_6 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_circling_mode.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_circling_mode.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -231,7 +231,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_circling_m
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_ballast_quantity_7 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_ballast_quantity.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_ballast_quantity.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -245,7 +245,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_ballast_qu
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_percent_symbol_8 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_percent_symbol.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_percent_symbol.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -259,7 +259,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_percent_sy
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_feet_9 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_feet.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_feet.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -273,7 +273,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_feet_9 {
 	}
 gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_metres_10 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_label_metres.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_label_metres.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -288,7 +288,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_metres_10 
 	}
 gauges_dg808s_panel_2-element #cambridge_needle {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_needle.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/variometer_variometer_needle.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -305,7 +305,7 @@ gauges_dg808s_panel_2-element #Mainframe #vsi {
 		overflow: hidden;
 		left: 147px;
 		top: 154px;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/vsi_vsi_background.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/vsi/vsi_vsi_background.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		width: 84px;
@@ -316,7 +316,7 @@ gauges_dg808s_panel_2-element #Mainframe #vsi {
 }
 gauges_dg808s_panel_2-element #Mainframe #vsi_vsi_needle_0 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/vsi_vsi_needle.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/vsi/vsi_vsi_needle.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -333,7 +333,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display {
 		overflow: hidden;
 		left: 130px;
 		top: 5px;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_nav_display_background.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_nav_display_background.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		width: 121px;
@@ -344,7 +344,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display {
 }
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_out_0 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_go_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_go_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -358,7 +358,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_out_
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_in_1 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_go_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_go_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -372,7 +372,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_in_1
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_out_2 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_power_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_power_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -386,7 +386,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_o
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_in_3 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_power_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_power_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -400,7 +400,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_i
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_right_out_4 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_right_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_right_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -414,7 +414,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_ri
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_right_in_5 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_right_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_right_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -428,7 +428,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_ri
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_down_out_6 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_down_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_down_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -442,7 +442,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_do
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_down_in_7 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_down_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_down_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -456,7 +456,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_do
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up_out_8 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_up_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_up_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -470,7 +470,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up_in_9 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_up_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_up_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -484,7 +484,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_left_out_10 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_left_out.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_left_out.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
@@ -498,7 +498,7 @@ gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_le
 	}
 gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_left_in_11 {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display_button_nav_display_page_left_in.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_left_in.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;

@@ -30,7 +30,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         // Netto vars
         this.netto_ms = 0;
 
-        // Cruise/climb mode vars (Caambridge vario will switch)
+        // Cruise/climb mode vars (Cambridge vario will switch)
         this.climb_mode = true;
 
         // Vario Tone vars
@@ -85,22 +85,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         // Collect simvar data used by multiple instruments
         this.update_local_vars();
 
-        this.update_total_energy(); // uses local simvars
-        this.update_netto();        // uses total energy
+        this.update_climb_mode();
+        this.update_total_energy();
+        this.update_netto();
         this.update_winter_vario();
         this.update_vario_tone();
         this.update_asi();
         this.update_cambridge_vario();
+        // This debug routine paints var values onto panel, toggled with 'L' (lights) key.
         this.update_debug();
     }
-
-    /*playInstrumentSound(soundId) {
-        if (this.isElectricityAvailable()) {
-            Coherent.call("PLAY_INSTRUMENT_SOUND", soundId);
-            return true;
-        }
-        return false;
-    }	*/
 
     // ************************************************************
     // init_polar()
@@ -199,6 +193,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         // Note polar_sink is POSITIVE
         //Set the local var and SimVar
         this.netto_ms = this.te_ms + this.polar_sink(this.airspeed_ms);
+
+        // At low airspeed (e.g. on runway) then reduce netto reading
+        // A real instrument will read 0 at an airspeed of 0
+        if (this.airspeed_ms < 15) {
+            // effective speed is 0..10 for airspeeds of 5..15
+            let effective_speed = Math.max(0,this.airspeed_ms - 5);
+            // We gradually 'feed in' the correct netto between 5..15 m/s airspeed
+            this.netto_ms = this.netto_ms * effective_speed / 10;
+        }
+
         SimVar.SetSimVarValue("L:NETTO", "meters per second", this.netto_ms);
     }
 

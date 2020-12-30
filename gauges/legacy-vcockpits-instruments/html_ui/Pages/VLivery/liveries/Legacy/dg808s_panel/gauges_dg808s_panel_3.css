@@ -42,7 +42,7 @@ gauges_dg808s_panel_3-element {
 	height: 100%;
 	background: transparent;
   }
-	
+
     gauges_dg808s_panel_3-element #Mainframe #background {
       width: 100%;
       height: 100%;
@@ -50,7 +50,7 @@ gauges_dg808s_panel_3-element {
 	  background: transparent;
 	}
 
-	
+
 gauges_dg808s_panel_3-element #Mainframe #yawStringRoot {
 	position: absolute;
 	left: 512px;
@@ -58,7 +58,7 @@ gauges_dg808s_panel_3-element #Mainframe #yawStringRoot {
 	width: 10px;
 	height: 5px;
 	overflow: visible;
-	background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring-base.png");
+	background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring/yawstring-base.png");
 	background-size: 100%;
 	background-repeat: no-repeat;
 	background-position: 50% 100%;
@@ -99,7 +99,7 @@ gauges_dg808s_panel_3-element #Mainframe #centralDot {
 	border-radius: 50%;
 	top: 90px;
 }
-	
+
 gauges_dg808s_panel_3-element #Mainframe .yawStringEl {
 		position: absolute;
 /*		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi_asi_background.png");*/
@@ -116,13 +116,13 @@ gauges_dg808s_panel_3-element #Mainframe .yawStringEl {
 }
 gauges_dg808s_panel_3-element #Mainframe #yawString1, gauges_dg808s_panel_3-element #Mainframe #yawString4, gauges_dg808s_panel_3-element #Mainframe #yawString7, gauges_dg808s_panel_3-element #Mainframe #yawString10
 {
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring-section1.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring/yawstring-section1.png");
 }
 gauges_dg808s_panel_3-element #Mainframe #yawString2, gauges_dg808s_panel_3-element #Mainframe #yawString5, gauges_dg808s_panel_3-element #Mainframe #yawString8
 {
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring-section2.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring/yawstring-section2.png");
 }
 gauges_dg808s_panel_3-element #Mainframe #yawString3, gauges_dg808s_panel_3-element #Mainframe #yawString6, gauges_dg808s_panel_3-element #Mainframe #yawString9
 {
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring-section3.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring/yawstring-section3.png");
 }

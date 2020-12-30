@@ -36,6 +36,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         this.update_radio();
         this.update_transponder();
         this.update_compass();
+        this.update_label();
     }
 
     /*playInstrumentSound(soundId) {
@@ -618,6 +619,18 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		  if (transform != '')
 		    compass_compass_lubber_line_3.style.transform = transform;
 
+		}
+    }
+
+    //***********************************************************************************
+    //***********  LABEL      *********************************************************
+    //***********************************************************************************
+    update_label() {
+        let label = this.querySelector("#label");
+		if (typeof label !== "undefined") {
+            let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
+            let flap_name = [ "dummy", "-3", "-2", "-1", "0", "T", "L" ][flap_index];
+            label.innerHTML = flap_name;
 		}
     }
 
