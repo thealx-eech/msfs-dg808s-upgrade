@@ -7,6 +7,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.MS_TO_KT = 1.94384; // speed conversion consts
         this.MS_TO_KPH = 3.6;
         this.MS_TO_FPS = 3.28084;
+        this.MS_TO_FPM = 196.85;
 
         this.location = "interior";
         this.curTime = 0.0;
@@ -15,14 +16,27 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		this.lastCheck = 0;
         this.climbValues = new Array(30);
 
-        // Total Energy vars
+        // 'Local' vars used by multiple instruments
         this.time_s = null;
         this.vertical_speed_ms = 0;
         this.airspeed_ms = 0;
+
+        // Total Energy vars
         this.previous_airspeed_ms = 0;
         this.previous_time_s = null;
         this.te_raw_ms = 0;
-        this.previous_te_ms = 0;
+        this.te_ms = 0;
+
+        // Netto vars
+        this.netto_ms = 0;
+
+        // Cruise/climb mode vars (Caambridge vario will switch)
+        this.climb_mode = true;
+
+        // Vario Tone vars
+        this.vario_tone = 0;
+        this.debug_vario_tone_change = true;
+        this.vario_tone_inc = 1;
 
         // Debug refresh timer and smoothed flight parameters
         this.debug_enabled = false;
@@ -30,6 +44,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_glide_ratio = 50;
         this.debug_te_ms = 0;
         this.debug_airspeed_ms = 0;
+
+        // Initialise polar data structure (for speed->sink calculation)
+        this.init_polar();
     }
 
     get templateID() { return "gauges_dg808s_panel_2"; }
@@ -65,9 +82,15 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     //********************************************************************
 
     Update() {
+        // Collect simvar data used by multiple instruments
+        this.update_local_vars();
+
+        this.update_total_energy(); // uses local simvars
+        this.update_netto();        // uses total energy
         this.update_winter_vario();
         this.update_vario_tone();
-        this.updateInstruments();
+        this.update_asi();
+        this.update_cambridge_vario();
         this.update_debug();
     }
 
@@ -80,19 +103,63 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }	*/
 
     // ************************************************************
-    // Return TOTAL ENERGY climb rate in meters per second
+    // init_polar()
+    // Initializes the this.polar_speed and this.polar_sink arrays.
+    // E.g. at 100Kph in still air the DG808S will sink at 0.57 m/s.
     // ************************************************************
-    get_total_energy_ms() {
-        this.airspeed_ms = SimVar.GetSimVarValue("A:VELOCITY BODY Z", "feet per second") / this.MS_TO_FPS;
+    init_polar() {
+        this.polar_speed_ref = [ -10, 60, 70, 72,  80, 90, 100, 110, 120, 130, 150, 170,200,210,220,230,300];
+        this.polar_sink_ref =  [  10,  3,0.6,0.5,0.48,0.5,0.57,0.61,0.67,0.75,0.98,1.29,1.9,2.3,2.9,3.6,8.5];
+
+        for (let i=0;i<this.polar_speed_ref.length;i++) {
+            this.polar_speed_ref[i] = this.polar_speed_ref[i] / this.MS_TO_KPH; // polar speeds in m/s
+        }
+    }
+
+    // ************************************************************
+    // polar_sink(airspeed m/s) returns sink m/s
+    // Interpolates in this.polar_speed_ref / this.polar_sink_ref
+    // ************************************************************
+    polar_sink(airspeed) {
+        //return 0.1234;
+        let polar_count = this.polar_speed_ref.length;
+        let i = 0;
+        // Iterate through 'polar_speed_ref' array until airspeed between [i-1]th and [i]th
+        while (i < polar_count && airspeed > this.polar_speed_ref[i]) {
+            i++;
+        }
+        // Check airspeed < lowest value in polar_speed_ref
+        if (i == 0) {
+            return this.polar_sink_ref[0];
+        }
+
+        let airspeed_diff = this.polar_speed_ref[i] - this.polar_speed_ref[i-1];
+        let sink_diff = this.polar_sink_ref[i] - this.polar_sink_ref[i-1];
+        let speed_ratio = (airspeed - this.polar_speed_ref[i-1]) / airspeed_diff;
+
+        return this.polar_sink_ref[i-1] + sink_diff * speed_ratio;
+    }
+
+    // ************************************************************
+    // Update 'local' values from Simvars
+    // ************************************************************
+    update_local_vars() {
+        this.airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED TRUE", "feet per second") / this.MS_TO_FPS;
         this.vertical_speed_ms = SimVar.GetSimVarValue("A:VELOCITY WORLD Y", "feet per second") / this.MS_TO_FPS;
         this.time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
+    }
+
+    // ************************************************************
+    // Set "L:TOTAL ENERGY, meters per second"  climb rate
+    // ************************************************************
+    update_total_energy() {
         let g = 9.81; // Gravitational constant
 
         // Detect startup and return 0
         if (this.previous_time_s == null) {
             this.previous_airspeed_ms = this.airspeed_ms;
             this.previous_time_s = this.time_s;
-            this.previous_te_ms = 0.0;
+            this.te_ms = 0.0;
             // Make initial TE reading zero, will increment from here.
             return 0.0;
         }
@@ -100,7 +167,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         let time_s_delta = this.time_s - this.previous_time_s;
         // Avoid a bad reading or divide-by-zero if this frame is ~same as previous
         if (time_s_delta < 0.0001) {
-            return this.previous_te_ms;
+            return this.te_ms;
         }
 
         let airspeed_ms_squared_delta = this.airspeed_ms**2 - this.previous_airspeed_ms**2;
@@ -108,28 +175,51 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.te_raw_ms = this.vertical_speed_ms + te_compensation_ms;
 
         // smoothing TE
-        let te_ms = 0.92 * this.previous_te_ms + 0.08 * this.te_raw_ms;
+        let te_ms = 0.96 * this.te_ms + 0.04 * this.te_raw_ms;
 
         // OK we've calculated te_ms, so can store the current time/speed/height for the next update
         this.previous_airspeed_ms = this.airspeed_ms;
         this.previous_time_s = this.time_s;
-        this.previous_te_ms = te_ms;
 
+        // Set the local var and SimVar
+        this.te_ms = te_ms;
         SimVar.SetSimVarValue("L:TOTAL ENERGY", "meters per second", te_ms);
+    }
 
-        return te_ms;
+    // **************************************************************************************************
+    // Set "L:NETTO, meters per second"  climb rate
+    // Netto is simple the TE climb rate with the natural sink of the aircraft (from the polar) removed
+    // **************************************************************************************************
+
+    update_netto() {
+        // Uses this.te_ms
+        // Uses this.airspeed_ms
+        // Uses this.netto_ms
+
+        // Note polar_sink is POSITIVE
+        //Set the local var and SimVar
+        this.netto_ms = this.te_ms + this.polar_sink(this.airspeed_ms);
+        SimVar.SetSimVarValue("L:NETTO", "meters per second", this.netto_ms);
+    }
+
+    // ***************************************************************
+    // Update cruise/climb mode (Audio will switch Netto -> TE)
+    // ***************************************************************
+    update_climb_mode() {
+        // Uses this.climb_mode
+        this.climb_mode = true;
     }
 
     //******************************************************************************
     //************** VARIO TONE       **********************************************
     //******************************************************************************
     update_vario_tone() {
-    	// VARIO TONE
-		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool"))
-            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", this.te_raw_ms * 196.85)
-        else
-            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0)
-
+		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool")) {
+            let climb_rate = this.climb_mode ? this.te_ms : this.netto_ms;
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", climb_rate * this.MS_TO_FPM);
+        } else {
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0);
+        }
     }
 
     //******************************************************************************
@@ -142,7 +232,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 		/* VSI_VSI_NEEDLE_0 */
 		var vsi_vsi_needle_0 = this.querySelector("#vsi_vsi_needle_0");
 		if (typeof vsi_vsi_needle_0 !== "undefined") {
-            let te_ms = this.get_total_energy_ms();
+            let te_ms = this.te_ms;
             // Limit range to -5 .. +5 m/s
             te_ms = Math.min(te_ms, max);
             te_ms = Math.max(te_ms, min);
@@ -150,6 +240,92 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             //let ExpressionResult = 2; // TE Climb rate in knots
 			let transform = 'rotate('+(te_ms / max * max_degrees)+'deg)';
 		    vsi_vsi_needle_0.style.transform = transform;
+		}
+    }
+
+    // *************************************************************************************************************************
+    // ************* AIRSPEED INDICATOR                       ******************************************************************
+    // *************************************************************************************************************************
+    update_asi() {
+		/* ASI_ASI_NEEDLE_0 */
+		var asi_asi_needle_0 = this.querySelector("#asi_asi_needle_0");
+		if (typeof asi_asi_needle_0 !== "undefined") {
+		  var transform = '';
+
+		  {
+
+			var ExpressionResult = (SimVar.GetSimVarValue("AIRSPEED INDICATED", "knots")); /* PARSED FROM "(A:Airspeed select indicated or true,knots)" */
+			var Minimum = 0.000;
+			ExpressionResult = Math.max(ExpressionResult, Minimum);
+			var Maximum = 160.000;
+			ExpressionResult = Math.min(ExpressionResult, Maximum);
+			var PointsTo = 180;
+			var NonlinearityTable = [
+				[0, 541.941486390914],
+				[15, 541.941486390914],
+				[20, 560.146264446839],
+				[40, 649.490530507975],
+				[60, 743.898791636159],
+				[80, 818.412345290427],
+				[100, 884.611532167241],
+				[120, 943.970845195694],
+				[160, 1043.22281389057],
+			];
+
+			if (NonlinearityTable.length > 0) {
+			    Minimum = NonlinearityTable[0][0];
+			    ExpressionResult = Math.max(ExpressionResult, Minimum);
+			    Maximum = NonlinearityTable[NonlinearityTable.length-1][0];
+			    ExpressionResult = Math.min(ExpressionResult, Maximum);
+				var prevAngle = 0;
+				var result = 0;
+				var prevVal = Minimum;
+				for (var i = 0; i < NonlinearityTable.length; i++) {
+					var NonlinearityEntry = NonlinearityTable[i][0];
+					var NonlinearityAngle = NonlinearityTable[i][1];
+					if (NonlinearityAngle < 0) { NonlinearityAngle += 360 };
+					if (ExpressionResult == NonlinearityEntry || prevAngle == NonlinearityAngle && ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry) {
+						result = NonlinearityAngle;
+						break;
+					}
+					else if (ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry ) {
+						var coef = 1 - (NonlinearityEntry - ExpressionResult) / (NonlinearityEntry - prevVal);
+
+						result = prevAngle + coef * (NonlinearityAngle - prevAngle);
+						break;
+					}
+					prevVal = NonlinearityEntry;
+					prevAngle = NonlinearityAngle;
+				}
+
+				if (Minimum >= 0)
+					while (result < 0)
+						result += 360;
+
+				transform += 'rotate(' + (result + PointsTo) + 'deg) ';
+			}
+
+		  }
+		  if (transform != '') asi_asi_needle_0.style.transform = transform;
+
+		}
+    } // end update_asi()
+
+    // *************************************************************************************************************************
+    // ************* CAMBRIDGE VARIO                          ******************************************************************
+    // *************************************************************************************************************************
+    update_cambridge_vario() {
+		let needle = this.querySelector("#cambridge_needle");
+        const min = -5;    // m/s
+        const max = 5;     // m/s
+        const max_degrees = 179;
+		if (typeof needle !== "undefined") {
+            let netto_ms = this.netto_ms;
+            // Limit range to -5 .. +5 m/s
+            netto_ms = Math.min(netto_ms, max);
+            netto_ms = Math.max(netto_ms, min);
+			let transform = 'rotate('+(netto_ms / max * max_degrees)+'deg)';
+		    needle.style.transform = transform;
 		}
     }
 
@@ -542,280 +718,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 		}
 
-    }
-
-    updateInstruments() {
-
-       // TAXI LIGHTS CONTROL
-       if (SimVar.GetSimVarValue("IS GEAR RETRACTABLE", "Boolean")) {
-         var gears_extracted = SimVar.GetSimVarValue("GEAR HANDLE POSITION", "Boolean");
-         if (SimVar.GetSimVarValue("LIGHT TAXI", "bool") && !gears_extracted)
-            SimVar.SetSimVarValue("K:TOGGLE_TAXI_LIGHTS", "bool", false)
-         else if (!SimVar.GetSimVarValue("LIGHT TAXI", "bool") && gears_extracted)
-            SimVar.SetSimVarValue("K:TOGGLE_TAXI_LIGHTS", "bool", true)
-       }
-
-	   // VARIO TOTAL ENERGY reading = (h2 - h1) + ((v + a)2 - v2)/(2 * g)
-		var airspeed = SimVar.GetSimVarValue("AIRSPEED TRUE", "meters per second");
-		var acceleration = SimVar.GetSimVarValue("ACCELERATION BODY Z", "meters per second squared");
-		var verticalSpeed = SimVar.GetSimVarValue("VERTICAL SPEED", "meters per second");
-		var total_energy = verticalSpeed + (Math.pow(airspeed + acceleration, 2) - Math.pow(airspeed,2)) / (2 * 9.81);
-
-		// VARIO AVERAGE SINK
-		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && this.lastCheck != parseInt(SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds"))) {
-			this.lastCheck = parseInt(SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds"));
-
-			this.climbValues.pop();
-			this.climbValues.unshift(total_energy * 1.94);
-		}
-
-		/* DISPLAY VARIO ELEMENTS */
-		this.querySelector(".battery_required").style.display = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? "block" : "none";
-
-		/* ASI_ASI_NEEDLE_0 */
-		var asi_asi_needle_0 = this.querySelector("#asi_asi_needle_0");
-		if (typeof asi_asi_needle_0 !== "undefined") {
-		  var transform = '';
-
-		  {
-
-			var ExpressionResult = (SimVar.GetSimVarValue("AIRSPEED INDICATED", "knots")); /* PARSED FROM "(A:Airspeed select indicated or true,knots)" */
-			var Minimum = 0.000;
-			ExpressionResult = Math.max(ExpressionResult, Minimum);
-			var Maximum = 160.000;
-			ExpressionResult = Math.min(ExpressionResult, Maximum);
-			var PointsTo = 180;
-			var NonlinearityTable = [
-				[0, 541.941486390914],
-				[15, 541.941486390914],
-				[20, 560.146264446839],
-				[40, 649.490530507975],
-				[60, 743.898791636159],
-				[80, 818.412345290427],
-				[100, 884.611532167241],
-				[120, 943.970845195694],
-				[160, 1043.22281389057],
-			];
-
-			if (NonlinearityTable.length > 0) {
-			    Minimum = NonlinearityTable[0][0];
-			    ExpressionResult = Math.max(ExpressionResult, Minimum);
-			    Maximum = NonlinearityTable[NonlinearityTable.length-1][0];
-			    ExpressionResult = Math.min(ExpressionResult, Maximum);
-				var prevAngle = 0;
-				var result = 0;
-				var prevVal = Minimum;
-				for (var i = 0; i < NonlinearityTable.length; i++) {
-					var NonlinearityEntry = NonlinearityTable[i][0];
-					var NonlinearityAngle = NonlinearityTable[i][1];
-					if (NonlinearityAngle < 0) { NonlinearityAngle += 360 };
-					if (ExpressionResult == NonlinearityEntry || prevAngle == NonlinearityAngle && ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry) {
-						result = NonlinearityAngle;
-						break;
-					}
-					else if (ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry ) {
-						var coef = 1 - (NonlinearityEntry - ExpressionResult) / (NonlinearityEntry - prevVal);
-
-						result = prevAngle + coef * (NonlinearityAngle - prevAngle);
-						break;
-					}
-					prevVal = NonlinearityEntry;
-					prevAngle = NonlinearityAngle;
-				}
-
-				if (Minimum >= 0)
-					while (result < 0)
-						result += 360;
-
-				transform += 'rotate(' + (result + PointsTo) + 'deg) ';
-			}
-
-		  }
-		  if (transform != '')
-		    asi_asi_needle_0.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_ALTITUDE_0 */
-		var variometer_variometer_label_altitude_0 = this.querySelector("#variometer_variometer_label_altitude_0");
-		if (typeof variometer_variometer_label_altitude_0 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_altitude_0.style.transform = transform;
-
-		}
-
-		var variometer_variometer_value_altitude_0 = this.querySelector("#variometer_variometer_value_altitude_0");
-		if (typeof variometer_variometer_value_altitude_0 !== "undefined") {
-			//variometer_variometer_value_altitude_0.innerHTML = SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet").toFixed(0);
-		}
-
-
-		/* VARIOMETER_VARIOMETER_LABEL_AVERAGER_1 */
-		var variometer_variometer_label_averager_1 = this.querySelector("#variometer_variometer_label_averager_1");
-		if (typeof variometer_variometer_label_averager_1 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_averager_1.style.transform = transform;
-
-		}
-
-		var variometer_variometer_label_average_increasing_2 = this.querySelector("#variometer_variometer_label_average_increasing_2");
-		var variometer_variometer_label_average_decreasing_3 = this.querySelector("#variometer_variometer_label_average_decreasing_3");
-		var variometer_variometer_value_averager_1 = this.querySelector("#variometer_variometer_value_averager_1");
-		if (typeof variometer_variometer_value_averager_1 !== "undefined") {
-			var average = 0;
-			for (i = 0; i < this.climbValues.length; i++) {
-				if (typeof this.climbValues[i] !== "undefined") {
-					average += this.climbValues[i];
-				}
-			}
-
-			average /= 30;
-
-			variometer_variometer_label_average_increasing_2.style.display = average > 0.1 ? "block" : "none";
-			variometer_variometer_label_average_decreasing_3.style.display = average < 0.1 ? "block" : "none";
-
-			variometer_variometer_value_averager_1.innerHTML = average.toFixed(1);
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_PUSH_SPEED_UP_4 */
-		var variometer_variometer_label_push_speed_up_4 = this.querySelector("#variometer_variometer_label_push_speed_up_4");
-		if (typeof variometer_variometer_label_push_speed_up_4 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_push_speed_up_4.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_PULL_SLOW_DOWN_5 */
-		var variometer_variometer_label_pull_slow_down_5 = this.querySelector("#variometer_variometer_label_pull_slow_down_5");
-		if (typeof variometer_variometer_label_pull_slow_down_5 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_pull_slow_down_5.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_CIRCLING_MODE_6 */
-		var variometer_variometer_label_circling_mode_6 = this.querySelector("#variometer_variometer_label_circling_mode_6");
-		if (typeof variometer_variometer_label_circling_mode_6 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_circling_mode_6.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_BALLAST_QUANTITY_7 */
-		var variometer_variometer_label_ballast_quantity_7 = this.querySelector("#variometer_variometer_label_ballast_quantity_7");
-		if (typeof variometer_variometer_label_ballast_quantity_7 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_ballast_quantity_7.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_PERCENT_SYMBOL_8 */
-		var variometer_variometer_label_percent_symbol_8 = this.querySelector("#variometer_variometer_label_percent_symbol_8");
-		if (typeof variometer_variometer_label_percent_symbol_8 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_percent_symbol_8.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_FEET_9 */
-		var variometer_variometer_label_feet_9 = this.querySelector("#variometer_variometer_label_feet_9");
-		if (typeof variometer_variometer_label_feet_9 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_feet_9.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_LABEL_METRES_10 */
-		var variometer_variometer_label_metres_10 = this.querySelector("#variometer_variometer_label_metres_10");
-		if (typeof variometer_variometer_label_metres_10 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    variometer_variometer_label_metres_10.style.transform = transform;
-
-		}
-
-		/* VARIOMETER_VARIOMETER_NEEDLE_11 */
-		var variometer_variometer_needle_11 = this.querySelector("#variometer_variometer_needle_11");
-		if (typeof variometer_variometer_needle_11 !== "undefined") {
-		  var transform = '';
-
-		  {
-			var ExpressionResult = 	SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? SimVar.GetSimVarValue("L:TOTAL ENERGY", "knots") : 0;
-			var Minimum = -10.000;
-			ExpressionResult = Math.max(ExpressionResult, Minimum);
-			var Maximum = 10.000;
-			ExpressionResult = Math.min(ExpressionResult, Maximum);
-			var PointsTo = 90;
-			var NonlinearityTable = [
-				[-10, 451.123864221415],
-				[0, 629.131514590992],
-				[10, 811.123864221415],
-			];
-
-			if (NonlinearityTable.length > 0) {
-			    Minimum = NonlinearityTable[0][0];
-			    ExpressionResult = Math.max(ExpressionResult, Minimum);
-			    Maximum = NonlinearityTable[NonlinearityTable.length-1][0];
-			    ExpressionResult = Math.min(ExpressionResult, Maximum);
-				var prevAngle = 0;
-				var result = 0;
-				var prevVal = Minimum;
-				for (var i = 0; i < NonlinearityTable.length; i++) {
-					var NonlinearityEntry = NonlinearityTable[i][0];
-					var NonlinearityAngle = NonlinearityTable[i][1];
-					if (NonlinearityAngle < 0) { NonlinearityAngle += 360 };
-					if (ExpressionResult == NonlinearityEntry || prevAngle == NonlinearityAngle && ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry) {
-						result = NonlinearityAngle;
-						break;
-					}
-					else if (ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry ) {
-						var coef = 1 - (NonlinearityEntry - ExpressionResult) / (NonlinearityEntry - prevVal);
-
-						result = prevAngle + coef * (NonlinearityAngle - prevAngle);
-						break;
-					}
-					prevVal = NonlinearityEntry;
-					prevAngle = NonlinearityAngle;
-				}
-
-				if (Minimum >= 0)
-					while (result < 0)
-						result += 360;
-
-				transform += 'rotate(' + (result + PointsTo) + 'deg) ';
-			}
-
-		  }
-		  if (transform != '')
-		    variometer_variometer_needle_11.style.transform = transform;
-
-		}
-    }
+    } // end update_nav()
 
     // ***********************************************************************************************************
     // ********** DEBUG              *****************************************************************************
     // ***********************************************************************************************************
 
     update_debug() {
+        let time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
+
         if (this.debug_update_time == null) {
-            this.debug_update_time = this.time_s;
+            this.debug_update_time = time_s;
+            return;
         }
         // Debug display properties (heavily smoothed)
         this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * this.airspeed_ms;
@@ -836,9 +750,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             }
             return;
         }
+
         /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
-        if (this.time_s - this.debug_update_time > 2) {
-            this.debug_update_time = this.time_s;
+        if (time_s - this.debug_update_time > 2) {
+            this.debug_update_time = time_s;
             // DEBUG GLIDE RATIO (max 99)
             var debug_el = this.querySelector("#nav_display_GaugeText_12");
             if (typeof debug_el !== "undefined") {
@@ -894,11 +809,13 @@ class gauges_dg808s_panel_2 extends TemplateElement {
                 debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
             }
             // DEBUG ASI
+            //let total_weight = SimVar.GetSimVarValue("A:TOTAL WEIGHT", "kilograms");
+            //let netto_ms = SimVar.GetSimVarValue("L:NETTO", "meters per second");
             debug_el = this.querySelector("#debug_asi_1");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.style.width = "80px";
-                debug_el.innerHTML = Math.floor(this.time_s % 10); //"ABCD";
+                debug_el.innerHTML = this.netto_ms.toFixed(2);
             }
             let jet_thrust = SimVar.GetSimVarValue("A:GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
             debug_el = this.querySelector("#debug_asi_2");

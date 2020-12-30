@@ -286,7 +286,7 @@ gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_label_metres_10 
 		top: calc(26.000px - 0px);
 		transform-origin: 0px 0px;
 	}
-gauges_dg808s_panel_2-element #Mainframe #variometer_variometer_needle_11 {
+gauges_dg808s_panel_2-element #cambridge_needle {
 		background: transparent;
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer_variometer_needle.png");
 		background-position: 0px 0px;
