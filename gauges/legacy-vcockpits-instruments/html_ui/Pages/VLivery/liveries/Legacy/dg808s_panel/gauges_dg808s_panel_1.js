@@ -629,7 +629,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         let label = this.querySelector("#label");
 		if (typeof label !== "undefined") {
             let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
-            let flap_name = [ "dummy", "-3", "-2", "-1", "0", "T", "L" ][flap_index];
+            let flap_name = [ "-3", "-2", "-1", "0", "T1", "T2", "L" ][flap_index];
             label.innerHTML = flap_name;
 		}
     }

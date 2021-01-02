@@ -1,0 +1,29 @@
+
+gauges_dg808s_panel_2-element #Mainframe #winter {
+		position: absolute;
+		overflow: hidden;
+		left: 147px;
+		top: 154px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/winter/winter_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 84px;
+		height: 84px;
+
+		transform: scale(calc(1 * 84 / 84), calc(1 * 84 / 84));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_2-element #Mainframe #winter_needle {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/winter/winter_needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 20px;
+		height: 6px;
+		left: calc(42.417px - 41.417px);
+		top: calc(41.582px - 1.582px);
+		transform-origin: 41.417px 1.582px;
+	}

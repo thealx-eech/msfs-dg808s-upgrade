@@ -1,0 +1,11 @@
+/* Label on panel (flap indicator) */
+
+gauges_dg808s_panel_1-element #Mainframe #label {
+		position: absolute;
+		overflow: hidden;
+		left: 3px;
+		top: 230px;
+		width: 81px;
+		height: 24px;
+        font-size: 24px;
+}

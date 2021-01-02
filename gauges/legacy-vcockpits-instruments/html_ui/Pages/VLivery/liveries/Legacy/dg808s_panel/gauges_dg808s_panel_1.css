@@ -802,13 +802,3 @@ gauges_dg808s_panel_1-element #Mainframe #compass_compass_lubber_line_3 {
 		top: calc(19.000px - 0px);
 		transform-origin: 0px 0px;
 	}
-
-gauges_dg808s_panel_1-element #Mainframe #label {
-		position: absolute;
-		overflow: hidden;
-		left: 3px;
-		top: 232px;
-		width: 81px;
-		height: 20px;
-        font-size: 20px;
-}

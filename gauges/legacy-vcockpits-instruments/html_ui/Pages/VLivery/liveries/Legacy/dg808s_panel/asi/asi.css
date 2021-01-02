@@ -1,0 +1,27 @@
+
+gauges_dg808s_panel_2-element #asi {
+		position: absolute;
+		overflow: hidden;
+		left: 10px;
+		top: 13px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi/background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 103px;
+		height: 104px;
+}
+
+gauges_dg808s_panel_2-element #asi_needle {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi/needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 9px;
+		height: 66px;
+		left: 47px;
+		top: 31px;
+		transform-origin: 4.500px 21.750px;
+	}

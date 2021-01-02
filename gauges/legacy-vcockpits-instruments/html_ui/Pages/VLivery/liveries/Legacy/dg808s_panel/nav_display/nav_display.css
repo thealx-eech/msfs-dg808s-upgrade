@@ -1,0 +1,554 @@
+
+gauges_dg808s_panel_2-element #Mainframe #nav_display {
+		position: absolute;
+		overflow: hidden;
+		left: 130px;
+		top: 5px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_nav_display_background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 121px;
+		height: 122px;
+
+		transform: scale(calc(1 * 121 / 121), calc(1 * 122 / 122));
+		transform-origin: 0 0;
+}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_out_0 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_go_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 14px;
+		left: calc(77.000px - 0px);
+		top: calc(4.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_go_in_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_go_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 14px;
+		left: calc(77.000px - 0px);
+		top: calc(4.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_out_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_power_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 17px;
+		height: 15px;
+		left: calc(29.000px - 0px);
+		top: calc(4.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_power_in_3 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_power_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 17px;
+		height: 15px;
+		left: calc(29.000px - 0px);
+		top: calc(4.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_right_out_4 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_right_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 15px;
+		height: 15px;
+		left: calc(94.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_right_in_5 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_right_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 15px;
+		height: 15px;
+		left: calc(94.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_down_out_6 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_down_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 14px;
+		left: calc(65.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_down_in_7 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_down_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 16px;
+		height: 14px;
+		left: calc(65.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up_out_8 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_up_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 17px;
+		height: 13px;
+		left: calc(39.000px - 0px);
+		top: calc(106.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_up_in_9 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_up_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 17px;
+		height: 13px;
+		left: calc(39.000px - 0px);
+		top: calc(106.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_left_out_10 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_left_out.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 18px;
+		height: 14px;
+		left: calc(11.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_button_nav_display_page_left_in_11 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_button_nav_display_page_left_in.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 18px;
+		height: 14px;
+		left: calc(11.000px - 0px);
+		top: calc(105.000px - 0px);
+		transform-origin: 0px 0px;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_12 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(28.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #202020;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_13 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_14 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(60.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_15 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_16 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(28.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 153px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_17 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_18 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(60.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_19 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(76.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_20 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(28.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_21 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_22 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(60.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_23 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(76.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 13px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 13px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_24 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(28.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_25 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_26 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(60.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_27 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(76.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_28 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(28.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 15px;
+		background: transparent;
+		vertical-align: CENTER;
+	}
+gauges_dg808s_panel_2-element #Mainframe #nav_display_GaugeText_29 {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+
+		width: 100%;
+		height: 100%;
+		left: calc(13.000px - 0px);
+		top: calc(44.000px - 0px);
+		transform-origin: 0px 0px;
+		white-space: nowrap; overflow: hidden;
+		font-family: "Quartz";
+		color: #101010;
+		font-size: 12px;
+		font-weight: 300;
+		overflow: hidden; max-width: 25ch;
+		width: 95px;
+		height: 13px;
+		background: transparent;
+		vertical-align: CENTER;
+	}

@@ -1,0 +1,177 @@
+/* Cambridge Vario */
+
+gauges_dg808s_panel_2-element #variometer {
+		position: absolute;
+		overflow: hidden;
+		left: 14px;
+		top: 152px;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		width: 90px;
+		height: 90px;
+}
+
+gauges_dg808s_panel_2-element .battery_required {
+		position: absolute;
+}
+
+gauges_dg808s_panel_2-element #variometer_averager_digits {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+		text-align: right;
+		font-family: "Quartz";
+		color: #000000;
+		font-size: 22px;
+
+		width: 25px;
+		height: 22px;
+		left: 20px;
+		top: 54px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_averager_decimal {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+		text-align: right;
+		font-family: "Quartz";
+		color: #000000;
+		font-size: 20px;
+
+		width: 25px;
+		height: 22px;
+		left: 35px;
+		top: 54px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_average_increasing {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/average_increasing.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        /*display: none;*/
+		width: 8px;
+		height: 5px;
+		left: 60px;
+		top: 58px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_average_decreasing {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/average_decreasing.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        /* display: none; */
+		width: 8px;
+		height: 6px;
+		left: 60px;
+		top: 66px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_flap_display {
+		position: absolute;
+		overflow: hidden;
+		font-family: "Quartz";
+		color: #000000;
+		font-size: 22px;
+	    text-align: center;
+        font-weight: 700;
+
+        /*display: none;*/
+		width: 30px;
+		height: 22px;
+		left: 18px;
+		top: 15px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_flap_up_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/arrow_up.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+		width: 11px;
+		height: 11px;
+		left: 45px;
+		top: 15px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_flap_up_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/arrow_up.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+		width: 11px;
+		height: 11px;
+		left: 55px;
+		top: 15px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_flap_down_1 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/arrow_down.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+		width: 11px;
+		height: 11px;
+		left: 45px;
+		top: 25px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_flap_down_2 {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/arrow_down.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+		width: 11px;
+		height: 11px;
+		left: 55px;
+		top: 25px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_circling {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/circling_mode.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+
+		width: 14px;
+		height: 11px;
+		left: 60px;
+		top: 42px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_needle {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/needle.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+
+		width: 54px;
+		height: 16px;
+		left: 2px;
+		top: 37px;
+		transform-origin: 43.000px 8.333px;
+	}
