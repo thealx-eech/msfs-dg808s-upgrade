@@ -58,10 +58,9 @@ gauges_dg808s_panel_2-element {
 
 .b21_debug {
     display: none; /* will be enabled in JS as needed */
-   /* background: transparent;
+   /* background: transparent; */
     position: absolute;
-    overflow: hidden;
-    */
+    /* overflow: hidden; */
     font-size: 20px;
     font-family: "Font-Bold";
     color: white;

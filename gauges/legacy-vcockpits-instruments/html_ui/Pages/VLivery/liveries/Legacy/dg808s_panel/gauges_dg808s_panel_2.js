@@ -87,6 +87,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.winter_update();
         this.asi_update();
         this.variometer_update();
+        this.nav_display_update();
 
         // This debug routine paints var values onto panel, toggled with 'L' (lights) key.
         this.debug_update();
@@ -238,8 +239,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         }
 
         SimVar.SetSimVarValue("L:NETTO", "meters per second", this.netto_ms);
-
-        this.debug1 = this.netto_ms.toFixed(2);
     }
 
     // ***************************************************************
@@ -258,12 +257,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             return;
         }
 
-        // LIGHT BEACON ON => CLIMB mode
-        if (SimVar.GetSimVarValue("A:LIGHT BEACON ON","boolean")) {
-            this.climb_mode = true;
-            return;
-        }
-
         // T1, T2, L flaps => CLIMB
         let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
         if (flap_index > 3) {
@@ -279,7 +272,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         // wings level for a while & not in lift => CRUISE
         this.climb_mode_bank_rad = SimVar.GetSimVarValue("A:PLANE BANK DEGREES", "radians") * 0.005 + this.climb_mode_bank_rad * 0.995;
-        this.debug4 = this.climb_mode_bank_rad.toFixed(4);
         if (this.climb_mode_bank_rad < 0.1 && this.netto_ms < 0.5 ) {
             this.climb_mode = false;
             return;
@@ -354,6 +346,11 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Initialise values on power-on
     variometer_init() {
         // Variometer (i.e. Cambridge) vars
+        this.variometer_mode_var = ["LIGHT BEACON ON","boolean"]; // Var to manual switch cruise/climb
+        //this.variometer_mode_var = ["VARIOMETER SWITCH","boolean"]; // MSFS not implemented !!
+        this.variometer_mode = "AUTO"; // CRUISE / CLIMB / AUTO
+        this.variometer_previous_mode = "AUTO";
+        this.variometer_previous_switch = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]);
         this.variometer_previous_climb_mode = null; // will be boolean true => climb, false => cruise
         this.variometer_average_ms = 0;          // current average reading (m/s)
         this.variometer_mode_time_s = null;      // MSFS timestamp when climb/cruise started
@@ -374,16 +371,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
 
     variometer_update() {
-        // Uses:
-        //    this.variometer_average_ms   -- current average reading (m/s)
-        //    this.variometer_mode_time_s -- MSFS timestamp when climb/cruise started
-        //    this.variometer_altitude_start_m -- start height of cruise or climb
-        //    this.variometer_update_time_s -- time when digits on vario were last updated
-        //    this.variometer_previous_climb_mode = null; // will be boolean true => climb, false => cruise
-        //    this.variometer_average_cruise_ms -- rolling average for cruise value
-        //    this.altitude_m -- global var
-        //    this.variometer_init_time_s  -- controls power on mode (show all indicators)
-
         const POWER_UP_TIME_S = 7; // duration (sec) of full power-up sequence
 
         // On first update all we do is init()
@@ -396,20 +383,14 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         if (this.time_s - this.variometer_init_time_s < POWER_UP_TIME_S) {
             const CYCLE_TIME_S = 4;
             const POWER_UP_DELAY_S = POWER_UP_TIME_S - CYCLE_TIME_S;
+            // 't' is time within CYCLE_TIME_S
             let t = this.time_s - this.variometer_init_time_s - POWER_UP_DELAY_S;
             // Do nothing during the power-up delay period
             if (t < 0) {
                 return;
             }
-            // cycle the vario needle 0 .. -10 .. + 10 .. 0
-            let needle_value = 0;
-            if (t < CYCLE_TIME_S / 4) {
-                needle_value = -5 * t / (CYCLE_TIME_S / 4);
-            } else if (t >= CYCLE_TIME_S / 4 && t < CYCLE_TIME_S * 3 / 4) {
-                needle_value = -5 + 10 * (t - CYCLE_TIME_S / 4) / (CYCLE_TIME_S / 2);
-            } else {
-                needle_value = 5 - 5 * (t - CYCLE_TIME_S * 3 / 4) / (CYCLE_TIME_S / 4);
-            }
+            // Sweep needle across full range
+            let needle_value = -5 * Math.sin(t / CYCLE_TIME_S * 2 * Math.PI);
             this.variometer_display_needle(needle_value);
             return;
         }
@@ -428,20 +409,38 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.variometer_update_time_s = this.time_s; // Initialize update time
         }
 
-        // Detect climb/cruise mode change. Update circling indicator
-        if (this.climb_mode != this.variometer_previous_climb_mode) { // always true on startup
+        // Detect climb/cruise mode change. Update circling/mode indicator
+        let vario_climb_mode = this.variometer_update_mode(); // vario_climb_mode will be true/false
+        // Also this.variometer_mode will have been set to "CRUISE" | "CLIMB" | "AUTO"
+        if (vario_climb_mode != this.variometer_previous_climb_mode ||
+                this.variometer_mode != this.variometer_previous_mode) {
             this.variometer_mode_time_s = this.time_s; // store start time of climb or cruise (e.g. for true average climb)
             this.variometer_update_time_s = this.time_s; // Initialize update time
             this.variometer_altitude_start_m = this.altitude_m;
-            this.variometer_previous_climb_mode = this.climb_mode;
+            this.variometer_previous_climb_mode = vario_climb_mode;
+            this.variometer_previous_mode = this.variometer_mode;
+            this.variometer_average_cruise_ms = 0;
 
-            // Set/hide circling indicator
-            let variometer_circling_el = this.querySelector("#variometer_circling");
-            if (this.climb_mode) {
-                variometer_circling_el.style.display = "block";
-            } else {
-                variometer_circling_el.style.display = "none";
-                this.variometer_average_cruise_ms = 0;
+            // Set/hide circling/TE/N indicators
+            let variometer_auto_climb_el = this.querySelector("#variometer_mode_auto_climb");
+            let variometer_climb_el = this.querySelector("#variometer_mode_climb");
+            let variometer_cruise_el = this.querySelector("#variometer_mode_cruise");
+            if (this.variometer_mode == "CRUISE") {
+                variometer_auto_climb_el.style.display = "none";
+                variometer_climb_el.style.display = "none";
+                variometer_cruise_el.style.display = "block";
+            } else if (this.variometer_mode == "CLIMB") {
+                variometer_auto_climb_el.style.display = "none";
+                variometer_cruise_el.style.display = "none";
+                variometer_climb_el.style.display = "block";
+            } else { // AUTO
+                variometer_cruise_el.style.display = "none";
+                variometer_climb_el.style.display = "none";
+                if (vario_climb_mode) {
+                    variometer_auto_climb_el.style.display = "block";
+                } else {
+                    variometer_auto_climb_el.style.display = "none";
+                }
             }
         }
 
@@ -450,7 +449,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             let average_comparator_ms = Math.round(this.variometer_average_ms*10) / 10;
             this.variometer_update_time_s = this.time_s;
             // Calculate averager reading m/s
-            if (this.climb_mode) {
+            if (vario_climb_mode) {
                 let climb_duration_s = this.time_s - this.variometer_mode_time_s;
                 // avoid divide by zero
                 if (climb_duration_s > 2) {
@@ -472,6 +471,39 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
         this.variometer_display_flap(flap_index);
     }
+
+    // Toggle the variometer between CRUISE -> CLIMB -> AUTO, and return true/false for climb mode:
+    // If the mode is CLIMB, return true (manual selected climb mode)
+    // If the mode is CRUISE, return false (manual selected cruise mode)
+    // If the mode if AUTO, return this.climb_mode
+    variometer_update_mode() {
+        // this.variometer_mode_var true => CLIMB mode
+        let vario_switch = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]);
+        // Detect a switch change, if so change this.variometer_mode
+        if (vario_switch != this.variometer_previous_switch) {
+            this.variometer_previous_switch = vario_switch;
+            // Toggle variometer_mode CRUISE -> CLIMB -> AUTO
+            if (this.variometer_mode == "CRUISE") {
+                this.variometer_mode = "CLIMB";
+            } else if (this.variometer_mode == "CLIMB") {
+                this.variometer_mode = "AUTO";
+            } else {
+                this.variometer_mode = "CRUISE";
+            }
+        }
+        // Select the AUTO climb mode value
+        let return_climb_mode = this.climb_mode;
+        // Override if "CRUISE" or "CLIMB" modes
+        if (this.variometer_mode == "CRUISE") {
+            return_climb_mode = false;
+        } else if (this.variometer_mode == "CLIMB") {
+            return_climb_mode = true;
+        }
+        this.debug3 = this.variometer_mode;
+        this.debug4 = return_climb_mode;
+        return return_climb_mode;
+    }
+
 
     // Update the needle position
     variometer_display_needle(needle_value) {
@@ -569,391 +601,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     //******************************************************************************
     //************** NAV INSTRUMENT     ********************************************
     //******************************************************************************
-    update_nav(){
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_GO_OUT_0 */
-		var nav_display_button_nav_display_go_out_0 = this.querySelector("#nav_display_button_nav_display_go_out_0");
-		if (typeof nav_display_button_nav_display_go_out_0 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_go_out_0.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_GO_IN_1 */
-		var nav_display_button_nav_display_go_in_1 = this.querySelector("#nav_display_button_nav_display_go_in_1");
-		if (typeof nav_display_button_nav_display_go_in_1 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_go_in_1.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_go_in_1.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_POWER_OUT_2 */
-		var nav_display_button_nav_display_power_out_2 = this.querySelector("#nav_display_button_nav_display_power_out_2");
-		if (typeof nav_display_button_nav_display_power_out_2 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_power_out_2.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_POWER_IN_3 */
-		var nav_display_button_nav_display_power_in_3 = this.querySelector("#nav_display_button_nav_display_power_in_3");
-		if (typeof nav_display_button_nav_display_power_in_3 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_power_in_3.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_power_in_3.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_RIGHT_OUT_4 */
-		var nav_display_button_nav_display_page_right_out_4 = this.querySelector("#nav_display_button_nav_display_page_right_out_4");
-		if (typeof nav_display_button_nav_display_page_right_out_4 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_right_out_4.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_RIGHT_IN_5 */
-		var nav_display_button_nav_display_page_right_in_5 = this.querySelector("#nav_display_button_nav_display_page_right_in_5");
-		if (typeof nav_display_button_nav_display_page_right_in_5 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_page_right_in_5.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_right_in_5.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_DOWN_OUT_6 */
-		var nav_display_button_nav_display_page_down_out_6 = this.querySelector("#nav_display_button_nav_display_page_down_out_6");
-		if (typeof nav_display_button_nav_display_page_down_out_6 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_down_out_6.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_DOWN_IN_7 */
-		var nav_display_button_nav_display_page_down_in_7 = this.querySelector("#nav_display_button_nav_display_page_down_in_7");
-		if (typeof nav_display_button_nav_display_page_down_in_7 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_page_down_in_7.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_down_in_7.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_UP_OUT_8 */
-		var nav_display_button_nav_display_page_up_out_8 = this.querySelector("#nav_display_button_nav_display_page_up_out_8");
-		if (typeof nav_display_button_nav_display_page_up_out_8 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_up_out_8.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_UP_IN_9 */
-		var nav_display_button_nav_display_page_up_in_9 = this.querySelector("#nav_display_button_nav_display_page_up_in_9");
-		if (typeof nav_display_button_nav_display_page_up_in_9 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_page_up_in_9.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_up_in_9.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_LEFT_OUT_10 */
-		var nav_display_button_nav_display_page_left_out_10 = this.querySelector("#nav_display_button_nav_display_page_left_out_10");
-		if (typeof nav_display_button_nav_display_page_left_out_10 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_left_out_10.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_BUTTON_NAV_DISPLAY_PAGE_LEFT_IN_11 */
-		var nav_display_button_nav_display_page_left_in_11 = this.querySelector("#nav_display_button_nav_display_page_left_in_11");
-		if (typeof nav_display_button_nav_display_page_left_in_11 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_button_nav_display_page_left_in_11.style.display = "block";
-
-		  if (transform != '')
-		    nav_display_button_nav_display_page_left_in_11.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_12 */
-		var nav_display_GaugeText_12 = this.querySelector("#nav_display_GaugeText_12");
-		if (typeof nav_display_GaugeText_12 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_12.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 0 ) ? "block" : "none";
-
-			nav_display_GaugeText_12.innerHTML = SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? "NAV TO:" + SimVar.GetSimVarValue("GPS WP NEXT ID", "string") :  "NO ACTIVE WP" ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_12.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_13 */
-		var nav_display_GaugeText_13 = this.querySelector("#nav_display_GaugeText_13");
-		if (typeof nav_display_GaugeText_13 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_13.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 0 ) ? "block" : "none";
-
-			nav_display_GaugeText_13.innerHTML = "";//( (SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "boolean")) ).toString() + "{if}" + ( ( ( 1 < -180 ) ?  1 :  ( ( 0 > 180 ) ?  1 : 0 ) ) ).toString() + "  " + ( ( ( 0 < -45 ) ?  '<' :  '' ) ).toString() + "((G:Var1) -25 < if{ '<' } els{ '' } )%!1s!" + ( ( ( 0 < -15 ) ?  '<' :  '' ) ).toString() + "((G:Var1) -10 < if{ '<' } els{ '' } )%!1s!" + ( ( ( 0 < -5 ) ?  '<' :  '' ) ).toString() + "|" + ( ( ( 0 > 5 ) ?  '>' :  '' ) ).toString() + "((G:Var1) 10 > if{ '>' } els{ '' } )%!1s!" + ( ( ( 0 > 15 ) ?  '>' :  '' ) ).toString() + "((G:Var1) 25 > if{ '>' } els{ '' } )%!1s!" + ( ( ( 0 > 45 ) ?  '>' :  '' ) ).toString() + "{end}" ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_13.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_14 */
-		var nav_display_GaugeText_14 = this.querySelector("#nav_display_GaugeText_14");
-		if (typeof nav_display_GaugeText_14 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_14.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 0 ) ? "block" : "none";
-
-			nav_display_GaugeText_14.innerHTML = "BRG:" + ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? Math.round( (SimVar.GetSimVarValue("GPS WP BEARING", "degrees")) ).toString() : "" ) + "TRK:" + Math.round( (SimVar.GetSimVarValue("GPS GROUND MAGNETIC TRACK", "degree")) ).toString() ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_14.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_15 */
-		var nav_display_GaugeText_15 = this.querySelector("#nav_display_GaugeText_15");
-		if (typeof nav_display_GaugeText_15 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_15.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 0 ) ? "block" : "none";
-
-			nav_display_GaugeText_15.innerHTML = "DIST:" + ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? ( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  (SimVar.GetSimVarValue("GPS WP DISTANCE", "nautical mile")) :  (SimVar.GetSimVarValue("GPS WP DISTANCE", "kilometers")) ) ).toFixed(1).toString() + ( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  'NM' :  'KM' ) ).toString() : "" ) ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_15.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_16 */
-		var nav_display_GaugeText_16 = this.querySelector("#nav_display_GaugeText_16");
-		if (typeof nav_display_GaugeText_16 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_16.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 1 ) ? "block" : "none";
-
-			nav_display_GaugeText_16.innerHTML = "WPT ETE";
-
-		  if (transform != '')
-		    nav_display_GaugeText_16.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_17 */
-		var nav_display_GaugeText_17 = this.querySelector("#nav_display_GaugeText_17");
-		if (typeof nav_display_GaugeText_17 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_17.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 1 ) ? "block" : "none";
-
-			nav_display_GaugeText_17.innerHTML = "NAV TO:" + ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? ( SimVar.GetSimVarValue("GPS WP NEXT ID", "string") ).toString() : "" ) ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_17.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_18 */
-		var nav_display_GaugeText_18 = this.querySelector("#nav_display_GaugeText_18");
-		if (typeof nav_display_GaugeText_18 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_18.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 1 ) ? "block" : "none";
-
-			nav_display_GaugeText_18.innerHTML = "ETE:" + Math.round( (SimVar.GetSimVarValue("GPS WP ETE", "minutes")) ).toString() + " MINS" ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_18.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_19 */
-		var nav_display_GaugeText_19 = this.querySelector("#nav_display_GaugeText_19");
-		if (typeof nav_display_GaugeText_19 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_19.style.display = "block";
-
-			nav_display_GaugeText_19.innerHTML = ( SimVar.GetSimVarValue("fs9gps:FlightPlanWaypointIdent", "string") ).toString() ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_19.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_20 */
-		var nav_display_GaugeText_20 = this.querySelector("#nav_display_GaugeText_20");
-		if (typeof nav_display_GaugeText_20 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_20.style.display = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && !(SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean")) ? "block" : "none";
-
-			nav_display_GaugeText_20.innerHTML = ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? "NAV TO:" + SimVar.GetSimVarValue("GPS WP NEXT ID", "string") : "NO ACTIVE WP" ) ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_20.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_21 */
-		var nav_display_GaugeText_21 = this.querySelector("#nav_display_GaugeText_21");
-		if (typeof nav_display_GaugeText_21 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_21.style.display = "none"//1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) ? "block" : "none";
-
-			nav_display_GaugeText_21.innerHTML = "LAT:" + ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? ( ( ( (SimVar.GetSimVarValue("GPS WP NEXT LAT", "degrees")) > 0 ) ?  'N' :  'S' ) ).toString() + ( Math.abs((SimVar.GetSimVarValue("GPS WP NEXT LAT", "degrees"))) ).toFixed(4).toString() : "" );
-
-		  if (transform != '')
-		    nav_display_GaugeText_21.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_22 */
-		var nav_display_GaugeText_22 = this.querySelector("#nav_display_GaugeText_22");
-		if (typeof nav_display_GaugeText_22 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_22.style.display = "none";//1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) ? "block" : "none";
-
-			nav_display_GaugeText_22.innerHTML = "LON:" + ( SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? ( ( ( (SimVar.GetSimVarValue("GPS WP NEXT LON", "degrees")) > 0 ) ?  'W' :  'E' ) ).toString() + ( Math.abs((SimVar.GetSimVarValue("GPS WP NEXT LON", "degrees"))) ).toFixed(4).toString() : "");
-
-		  if (transform != '')
-		    nav_display_GaugeText_22.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_23 */
-		var nav_display_GaugeText_23 = this.querySelector("#nav_display_GaugeText_23");
-		if (typeof nav_display_GaugeText_23 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_23.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) ? "block" : "none";
-
-			nav_display_GaugeText_23.innerHTML = "EL:" + ( (SimVar.GetSimVarValue("GPS IS ACTIVE WAY POINT", "bool") ? Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 2 ) ?  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "feet")) :  (SimVar.GetSimVarValue("GPS WP NEXT ALT", "meters")) ) ).toString() : "" )) + "SP:" + Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  (SimVar.GetSimVarValue("GPS GROUND SPEED", "knots")) :  (SimVar.GetSimVarValue("GPS GROUND SPEED", "kph")) ) ).toString() ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_23.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_24 */
-		var nav_display_GaugeText_24 = this.querySelector("#nav_display_GaugeText_24");
-		if (typeof nav_display_GaugeText_24 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_24.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 3 ) ? "block" : "none";
-
-			nav_display_GaugeText_24.innerHTML = "LOCAL WIND";
-
-		  if (transform != '')
-		    nav_display_GaugeText_24.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_25 */
-		var nav_display_GaugeText_25 = this.querySelector("#nav_display_GaugeText_25");
-		if (typeof nav_display_GaugeText_25 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_25.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 3 ) ? "block" : "none";
-
-			nav_display_GaugeText_25.innerHTML = "FROM:" + ( !SimVar.GetSimVarValue("SIM ON GROUND", "bool") ? Math.round( ((SimVar.GetSimVarValue("AMBIENT WIND DIRECTION", "degree")) - (SimVar.GetSimVarValue("MAGVAR", "degree")) + 360) % 360 ).toString() + "(MAG)" : "") ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_25.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_26 */
-		var nav_display_GaugeText_26 = this.querySelector("#nav_display_GaugeText_26");
-		if (typeof nav_display_GaugeText_26 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_26.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 3 ) ? "block" : "none";
-
-			nav_display_GaugeText_26.innerHTML = "AT:" + (!SimVar.GetSimVarValue("SIM ON GROUND", "bool") ? Math.round( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  (SimVar.GetSimVarValue("AMBIENT WIND VELOCITY", "knots")) :  (SimVar.GetSimVarValue("AMBIENT WIND VELOCITY", "m/s")) ) ).toString() + ( ( ( (SimVar.GetSimVarValue("UNITS OF MEASURE", "enum")) < 1 ) ?  'KTS' :  'MPS' ) ).toString() : "") ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_26.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_27 */
-		var nav_display_GaugeText_27 = this.querySelector("#nav_display_GaugeText_27");
-		if (typeof nav_display_GaugeText_27 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_27.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 3 ) ? "block" : "none";
-
-			nav_display_GaugeText_27.innerHTML = "REL WIND:" + ( !(SimVar.GetSimVarValue("SIM ON GROUND", "bool")) ? Math.round( Math.floor(((SimVar.GetSimVarValue("AMBIENT WIND DIRECTION", "degree")) - (SimVar.GetSimVarValue("PLANE HEADING DEGREES TRUE", "degrees")) + 360) % 360) ).toString() : "" ) ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_27.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_28 */
-		var nav_display_GaugeText_28 = this.querySelector("#nav_display_GaugeText_28");
-		if (typeof nav_display_GaugeText_28 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_28.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 4 ) ? "block" : "none";
-
-			nav_display_GaugeText_28.innerHTML = "CHRONOMETER";
-
-		  if (transform != '')
-		    nav_display_GaugeText_28.style.transform = transform;
-
-		}
-
-		/* NAV_DISPLAY_GAUGETEXT_29 */
-		var nav_display_GaugeText_29 = this.querySelector("#nav_display_GaugeText_29");
-		if (typeof nav_display_GaugeText_29 !== "undefined") {
-		  var transform = '';
-
-		  nav_display_GaugeText_29.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !(1 * (SimVar.GetSimVarValue("PARTIAL PANEL NAV", "boolean"))) && ( 0 == 4 ) ? "block" : "none";
-
-			nav_display_GaugeText_29.innerHTML = "ET:" + Math.round( Math.floor(((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) / 3600) ).toString() + ":" + Math.round( Math.floor(((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) % 3600 / 60) ).toString() + ":" + Math.round( ((SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds")) - 0) % 60 ).toString() ;
-
-		  if (transform != '')
-		    nav_display_GaugeText_29.style.transform = transform;
-
-		}
+    nav_display_update(){
+        let top_el = this.querySelector("#nav_display_top");
+        let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
+        top_el.innerHTML = wp_id;
+
+        let middle_el = this.querySelector("#nav_display_middle");
+        let height = Math.floor(SimVar.GetSimVarValue("GPS TARGET ALTITUDE", "meters") * this.M_TO_FT);
+        middle_el.innerHTML = height;
+
+        let bottom_el = this.querySelector("#nav_display_bottom");
+        let distance = Math.floor(SimVar.GetSimVarValue("GPS WP DISTANCE", "meters") / 1000);
+        bottom_el.innerHTML = distance;
 
     } // end update_nav()
 
@@ -968,6 +627,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_glide_ratio = 50;
         this.debug_te_ms = 0;
         this.debug_airspeed_ms = 0;
+        this.debug_var = ["A:LIGHT CABIN","bool"]; // the variable we use to enable/disable debug
     }
 
 
@@ -985,7 +645,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
 
         // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
-        let debug_enable = SimVar.GetSimVarValue("A:LIGHT CABIN","bool") ? true : false;
+        let debug_enable = SimVar.GetSimVarValue(this.debug_var[0], this.debug_var[1]) ? true : false;
 
         if (debug_enable) {
             this.debug_enabled = true;
@@ -1000,64 +660,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
         if (this.time_s - this.debug_update_time_s > 2) {
             this.debug_update_time_s = this.time_s;
-            // DEBUG GLIDE RATIO (max 99)
-            var debug_el = this.querySelector("#nav_display_GaugeText_12");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "8px";
-                debug_el.style.top = "26px";
-                debug_el.style.height = "30px";
-                debug_el.style.width = "36px";
-                debug_el.style["text-align"] = "right";
-                debug_el.style.color = this.debug_glide_ratio == 99 ? "pink" :"black";
-                debug_el.innerHTML = Math.floor(this.debug_glide_ratio + 0.5);
-            }
-            // DEBUG AIRSPEED KPH
-            debug_el = this.querySelector("#nav_display_GaugeText_13");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "34px";
-                debug_el.style.left = "48px";
-                debug_el.style.top = "18px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "36px";
-                debug_el.style.width = "60px";
-                debug_el.style["text-align"] = "right";
-                debug_el.innerHTML = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
-            }
-            // DEBUG FLAPS INDEX
-            //For flight model testing
-            let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
-            debug_el = this.querySelector("#nav_display_GaugeText_14");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "8px";
-                debug_el.style.top = "60px";
-                debug_el.style.color = "blue";
-                debug_el.style.height = "30px";
-                //debug_el.style["font-family"] = "Roboto-Regular";
-                debug_el.innerHTML = ""+flaps_index;
-            }
-            // DEBUG TOTAL ENERGY SINK
-            debug_el = this.querySelector("#nav_display_GaugeText_19");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.left = "28px";
-                debug_el.style.top = "55px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "36px";
-                debug_el.style.width = "76px";
-                debug_el.style["text-align"] = "right";
-                let te = this.te_ms; // to shorten next line
-                debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
-            }
             // DEBUG ASI
             //let total_weight = SimVar.GetSimVarValue("A:TOTAL WEIGHT", "kilograms");
             //let netto_ms = SimVar.GetSimVarValue("L:NETTO", "meters per second");
-            debug_el = this.querySelector("#debug_asi_1");
+
+            // ***************
+            // ASI DEBUG AREAS
+            // ***************
+
+            this.debug1 = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
+            let debug_el = this.querySelector("#debug1");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.style.width = "80px";
@@ -1065,50 +677,107 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             }
 
             //let jet_thrust = SimVar.GetSimVarValue("A:GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
-            this.debug2 = SimVar.GetSimVarValue("A:LIGHT BEACON ON", "boolean");
-            debug_el = this.querySelector("#debug_asi_2");
+            this.debug2 = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]) ? "ON" : "OFF";
+            debug_el = this.querySelector("#debug2");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
-                debug_el.innerHTML = this.debug2; //beacon_lights ? "ON" : "OFF";
+                debug_el.innerHTML = this.debug2;
             }
 
-            this.debug3 = SimVar.GetSimVarValue("A:AIRCRAFT WIND Y", "knots").toFixed(2);
-            debug_el = this.querySelector("#debug_asi_3");
+            //this.debug3 = SimVar.GetSimVarValue("A:AIRCRAFT WIND Y", "knots").toFixed(2);
+            debug_el = this.querySelector("#debug3");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.innerHTML = this.debug3;
             }
             //this.debug4 = "Y";
-            debug_el = this.querySelector("#debug_asi_4");
+            debug_el = this.querySelector("#debug4");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.innerHTML = this.debug4;
+            }
+
+            // ***********************
+            // NAV_DISPLAY DEBUG AREAS
+            // ***********************
+
+            // DEBUG GLIDE RATIO (max 99)
+            this.debug5 = Math.floor(this.debug_glide_ratio + 0.5);
+            debug_el = this.querySelector("#debug5");
+            if (false && typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.height = "30px";
+                debug_el.style.width = "30px";
+                debug_el.style.color = this.debug_glide_ratio == 99 ? "pink" :"black";
+                debug_el.innerHTML = this.debug5;
+            }
+            // DEBUG AIRSPEED KPH
+            this.debug6 = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
+            debug_el = this.querySelector("#debug6");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "24px";
+                debug_el.style.color = "white";
+                debug_el.style.height = "24px";
+                debug_el.innerHTML = this.debug6;
+            }
+            // DEBUG FLAPS INDEX
+            //For flight model testing
+            let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
+            debug_el = this.querySelector("#debug7");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.color = "blue";
+                debug_el.style.height = "30px";
+                debug_el.style.width = "10px";
+                //debug_el.style["font-family"] = "Roboto-Regular";
+                debug_el.innerHTML = ""+flaps_index;
+            }
+            // DEBUG TOTAL ENERGY SINK
+            debug_el = this.querySelector("#debug8");
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "block";
+                debug_el.style["font-size"] = "28px";
+                debug_el.style.color = "white";
+                debug_el.style.height = "36px";
+                let te = this.te_ms; // to shorten next line
+                debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
             }
         }
     } // end update_debug
 
     debug_clear() {
-        var debug_el = this.querySelector("#nav_display_GaugeText_12");
+        let debug_el = this.querySelector("#debug1");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }
-        debug_el = this.querySelector("#nav_display_GaugeText_13");
+        debug_el = this.querySelector("#debug2");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }
-        debug_el = this.querySelector("#nav_display_GaugeText_14");
+        debug_el = this.querySelector("#debug3");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }
-        debug_el = this.querySelector("#nav_display_GaugeText_19");
+        debug_el = this.querySelector("#debug4");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }
-        debug_el = this.querySelector("#debug_asi_1");
+        debug_el = this.querySelector("#debug5");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }
-        debug_el = this.querySelector("#debug_asi_2");
+        debug_el = this.querySelector("#debug6");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#debug7");
+        if (typeof debug_el !== "undefined") {
+            debug_el.style.display = "none";
+        }
+        debug_el = this.querySelector("#debug8");
         if (typeof debug_el !== "undefined") {
             debug_el.style.display = "none";
         }

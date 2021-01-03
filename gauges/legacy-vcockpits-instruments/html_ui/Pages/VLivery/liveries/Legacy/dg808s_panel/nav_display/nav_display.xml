@@ -1,0 +1,647 @@
+
+<SimBase.Document Type="AceXML" version="1,0" id="nav_display">
+    <Filename>nav_display.xml</Filename>
+    <SimGauge.Gauge id="nav_display" ArtDirectory="%INETROOT%\private\fs\art\objects\Airplanes\DG808S\panel\">
+        <FloatPosition>0.000,0.000</FloatPosition>
+        <Size>242,244</Size>
+        <Image id="nav_display_background.bmp" Name="nav_display_background.bmp">
+            <Transparent>True</Transparent>
+        </Image>
+        <Comment><Value>*******************************************************
+                    GPSNAV B21 v1.4
+                    1.4: small change so distance to wp = 0 if no flightplan (for 302)
+                    1.3: BUGFIX to use bearings TRUE, not mix with magnetic
+                    1.2: add WP selection up.down the flightplan
+                    1.1: improve readability from Microsoft version from DG808S
+        
+                    DEBUG display area
+         **********************************************************************
+         </Value></Comment>
+        <Element id="debug 1">
+            <FloatPosition>0.000,3.000</FloatPosition>
+            <Visibility>0</Visibility>
+            <GaugeText id="B21_mc">
+                <Size>160,30</Size>
+                <FontFace>arial</FontFace>
+                <FontColor>#ffffff</FontColor>
+                <FontHeight>30</FontHeight>
+                <Length>5</Length>
+                <Transparent>True</Transparent>
+                <VerticalAlign>TOP</VerticalAlign>
+                <HorizontalAlign>RIGHT</HorizontalAlign>
+                <GaugeString>%((L:B21_gpsnav_wp_ident, string))%!s!
+                </GaugeString>
+            </GaugeText>
+        </Element>
+        <Comment><Value>
+            ****************************************************************************
+            ******************  INITIALIZATION      ************************************
+            ****************************************************************************
+        </Value></Comment>
+        <Element id="init">
+            <Select>
+                <Expression>
+                    <Comment><Value>
+                          This code runs *once* when the gauge is loaded
+                          </Value>
+                    </Comment>
+                    <Script>
+                          (L:B21_gpsnav_init, bool) 0 == if{
+                            0 (&gt;L:B21_gpsnav_active_wp, number)
+                            500 (&gt;L:B21_gpsnav_wp_radius, meters)
+                            0 (&gt;L:B21_gpsnav_no_switch, bool)
+                            1.3 (&gt;L:B21_gpsnav_version, number)
+                            1 (&gt;L:B21_gpsnav_init, bool) 
+                          }
+                    </Script>
+                </Expression>
+            </Select>
+        </Element>
+        <Comment><Value>*******************************************************
+                    COLLECT ACTIVE WP INFO
+         **********************************************************************
+         outputs:
+             (L:B21_gpsnav_active_wp, number)
+             (L:B21_gpsnav_wp_distance, meters)
+             (L:B21_gpsnav_wp_bearing, degrees)
+         inputs:
+             (L:B21_gpsnav_active_wp, number)
+             
+         </Value></Comment>
+        <Element id="expression_wp_info">
+            <FloatPosition>0.000,0.000</FloatPosition>
+            <Select id="Select">
+                <Expression id="Expression2">
+                    <Minimum>-99999.000</Minimum>
+                    <Maximum>99999.000</Maximum>
+                    <Script>
+                        (L:B21_gpsnav_active_wp, number) (&gt;C:fs9gps:FlightPlanWaypointIndex, Number)
+                        
+                        (C:fs9gps:FlightPlanWaypointLatitude, degrees) (&gt;L:B21_gpsnav_wp_lat, degrees)
+                        (C:fs9gps:FlightPlanWaypointLongitude, degrees) (&gt;L:B21_gpsnav_wp_long, degrees)
+                        (C:fs9gps:FlightPlanWaypointAltitude, meters) (&gt;L:B21_gpsnav_wp_alt, meters)
+                        (C:fs9gps:FlightPlanWaypointETE, minutes) (&gt;L:B21_gpsnav_wp_ete, minutes)
+                        
+                        (A:GPS IS ACTIVE WAY POINT, bool) ! if{
+                            0 (&gt;L:B21_gpsnav_wp_distance, meters)
+                            0 (&gt;L:B21_gpsnav_wp_bearing, degrees)
+                            quit
+                        }
+                        (A:PLANE LATITUDE, degrees) (&gt;C:fs9gps:GeoCalcLatitude1, degrees)
+                        (A:PLANE LONGITUDE, degrees) (&gt;C:fs9gps:GeoCalcLongitude1, degrees)
+                        (C:fs9gps:FlightPlanWaypointLatitude, degrees) (&gt;C:fs9gps:GeoCalcLatitude2, degrees)
+                        (C:fs9gps:FlightPlanWaypointLongitude, degrees) (&gt;C:fs9gps:GeoCalcLongitude2, degrees)
+                        (C:fs9gps:GeoCalcDistance, meters) (&gt;L:B21_gpsnav_wp_distance, meters)
+                        (C:fs9gps:GeoCalcBearing, degrees) (&gt;L:B21_gpsnav_wp_bearing, degrees)
+                        
+                    </Script>
+                </Expression>
+            </Select>
+        </Element>
+        <Comment><Value>*******************************************************
+                    CALCULATE TRACK ERROR
+         **********************************************************************
+         outputs:
+             (L:B21_gpsnav_track_error, degrees)
+         inputs:
+             (L:B21_gpsnav_wp_bearing, degrees)
+             
+         </Value></Comment>
+        <Element>
+            <Select id="Select">
+                <Expression id="Expression2">
+                    <Minimum>-5.000</Minimum>
+                    <Maximum>5.000</Maximum>
+                    <Script>
+                        (A:GPS IS ACTIVE WAY POINT, bool) if{
+                            (L:B21_gpsnav_wp_bearing, degrees) (A:GPS GROUND TRUE TRACK,degrees) - d
+                            (&gt;L:B21_gpsnav_track_error, degrees)
+                            -180 &lt; if{ 
+                                (L:B21_gpsnav_track_error, degrees) 360 + 
+                                (&gt;L:B21_gpsnav_track_error, degrees) 
+                            } els{ 
+                                (L:B21_gpsnav_track_error, degrees) 180 &gt; if{
+                                    (L:B21_gpsnav_track_error, degrees) 360 - 
+                                    (&gt;L:B21_gpsnav_track_error, degrees) 
+                                } 
+                            }
+                        } els{
+                            0 (&gt;L:B21_gpsnav_track_error, degrees)
+                        }
+				    </Script>
+                </Expression>
+            </Select>
+        </Element>
+        <Comment><Value>*******************************************************
+                    AUTO-CHANGE TO NEXT WP
+         **********************************************************************
+         outputs:
+             (L:B21_gpsnav_active_wp, number)
+         inputs:
+             (L:B21_gpsnav_wp_distance, meters)
+         
+         If the user's last input was 'down arrow' AND we're inside the TP radius, then do NOT switch
+         </Value></Comment>
+        <Element>
+            <Select id="Select">
+                <Expression id="Expression2">
+                    <Minimum>-5.000</Minimum>
+                    <Maximum>5.000</Maximum>
+                    <Script>
+                        (A:GPS IS ACTIVE WAY POINT, bool)  ! if{
+                            quit
+                        }
+                        (C:fs9gps:FlightPlanwaypointsNumber, number) (L:B21_gpsnav_active_wp, number) == if{
+                            quit
+                        }
+                        (L:B21_gpsnav_wp_distance, meters) (L:B21_gpsnav_wp_radius, meters) &gt; if{
+                            0 (&gt;L:B21_gpsnav_no_switch, bool)
+                            quit
+                        } 
+                        
+                        (L:B21_gpsnav_no_switch, bool) if{ quit }
+                        
+                        (L:B21_gpsnav_active_wp, number) ++ (&gt;L:B21_gpsnav_active_wp, number)
+				    </Script>
+                </Expression>
+            </Select>
+        </Element>
+
+        <Element id="Home Line 1 To">
+            <FloatPosition>28.000,42.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>TREBUCHET MS</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>%((L:B21_gpsnav_active_wp, number) 1 +)%!d!:</GaugeString>
+                <Length>3</Length>
+                <Size>95,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 1">
+            <FloatPosition>76.000,42.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>TREBUCHET MS</FontFace>
+                <FontColor>#202020</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((C:fs9gps:FlightPlanWaypointIdent, String))%!s!%{else}NO WP%{end}</GaugeString>
+                <Length>12</Length>
+                <Size>190,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 2 zero">
+            <FloatPosition>120.000,85.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <Image id="zero.bmp" Name="zero.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 minus1">
+            <FloatPosition>93.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) -5 &lt; } els{ 0 }</Visibility>
+            <Image id="minus1.bmp" Name="minus1.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 minus2">
+            <FloatPosition>69.000,85.000</FloatPosition>
+            <Visibility> (G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) -14 &lt; } els{ 0 }</Visibility>
+            <Image id="minus2.bmp" Name="minus2.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 minus3">
+            <FloatPosition>48.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) -25 &lt; } els{ 0 }</Visibility>
+            <Image id="minus3.bmp" Name="minus3.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 minus4">
+            <FloatPosition>33.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) -45 &lt; } els{ 0 }</Visibility>
+            <Image id="minus4.bmp" Name="minus4.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 plus1">
+            <FloatPosition>131.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) 5 &gt; } els{ 0 }</Visibility>
+            <Image id="plus1.bmp" Name="plus1.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 plus2">
+            <FloatPosition>143.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) 14 &gt; } els{ 0 }</Visibility>
+            <Image id="plus2.bmp" Name="plus2.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 plus3">
+            <FloatPosition>168.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) 25 &gt; } els{ 0 }</Visibility>
+            <Image id="plus3.bmp" Name="plus3.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 2 plus4">
+            <FloatPosition>191.000,85.000</FloatPosition>
+            <Visibility>(G:Var2) 0 ==  if{ (L:B21_gpsnav_track_error, degrees) 45 &gt; } els{ 0 }</Visibility>
+            <Image id="plus4.bmp" Name="plus4.bmp">
+                <Transparent>True</Transparent>
+            </Image>
+        </Element>
+        <Element id="Home Line 3 Brg">
+            <FloatPosition>26.000,114.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>ARIAL</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>25</FontHeight>
+                <GaugeString>Brg:</GaugeString>
+                <Length>4</Length>
+                <Size>40,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 3 Trk">
+            <FloatPosition>128.000,114.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>ARIAL</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>25</FontHeight>
+                <GaugeString>Trk:</GaugeString>
+                <Length>4</Length>
+                <Size>40,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 3 bearing">
+            <FloatPosition>73.000,107.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((L:B21_gpsnav_wp_bearing, degrees))%!3d!%{else} %{end}</GaugeString>
+                <Length>4</Length>
+                <Size>50,36</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 3 track">
+            <FloatPosition>170.000,107.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>%((A:GPS GROUND TRUE TRACK,degrees))%!3d!</GaugeString>
+                <Length>4</Length>
+                <Size>50,36</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 4.1">
+            <FloatPosition>26.000,146.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>ARIAL</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <GaugeString>Dist:</GaugeString>
+                <Length>5</Length>
+                <Size>95,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="Home Line 4.2">
+            <FloatPosition>70.000,137.000</FloatPosition>
+            <Visibility> (G:Var2) 0 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>50</FontHeight>
+                <GaugeString>%((A:GPS IS ACTIVE WAY POINT, bool))%{if} %((E:UNITS OF MEASURE,enum) 1 &lt; if{ (L:B21_gpsnav_wp_distance, nmiles) } els{ (L:B21_gpsnav_wp_distance,kilometers) })%!5.1f!%{end}</GaugeString>
+                <Length>6</Length>
+                <Size>190,50</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT LIST Line 1">
+            <FloatPosition>26.000,48.000</FloatPosition>
+            <Visibility> (G:Var2) 1 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>40</FontHeight>
+                <GaugeString>*WPT ETE*</GaugeString>
+                <Length>8</Length>
+                <Size>190,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT LIST Line 2">
+            <FloatPosition>26.000,88.000</FloatPosition>
+            <Visibility> (G:Var2) 1 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>TO:%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((C:fs9gps:FlightPlanWaypointIdent, String))%!s!%{end} </GaugeString>
+                <Length>10</Length>
+                <Size>190,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>TOP</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT LIST Line 3">
+            <FloatPosition>26.000,120.000</FloatPosition>
+            <Visibility> (G:Var2) 1 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>ETE:%((L:B21_gpsnav_wp_ete,minutes))%!d! MIN</GaugeString>
+                <Length>8</Length>
+                <Size>190,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT LIST Line 4">
+            <FloatPosition>26.000,150.000</FloatPosition>
+            <Visibility> (G:Var2) 1 == </Visibility>
+            <GaugeText id="GaugeText">
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>36</FontHeight>
+                <GaugeString>GPSNAV: %((L:B21_gpsnav_version, number))%!1.1f!</GaugeString>
+                <Length>10</Length>
+                <Size>190,40</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+                <HorizontalAlign>CENTER</HorizontalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT DATA Line 1">
+            <FloatPosition>26.000,48.000</FloatPosition>
+            <Visibility> (G:Var2) 2 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>%((A:GPS IS ACTIVE WAY POINT, bool))%{if}TO:%((C:fs9gps:FlightPlanWaypointIdent, String))%!s!%{else}NO WP%{end}</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT DATA Line 2">
+            <FloatPosition>26.000,80.000</FloatPosition>
+            <Visibility> (G:Var2) 2 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>LAT:%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((L:B21_gpsnav_wp_lat,degrees) 0 &gt; if{ &apos;N&apos; } els{ &apos;S&apos; } )%!1s!%((L:B21_gpsnav_wp_lat,degrees) abs)%!7.4f!%{end}</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT DATA Line 3">
+            <FloatPosition>26.000,112.000</FloatPosition>
+            <Visibility> (G:Var2) 2 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>LON:%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((L:B21_gpsnav_wp_long,degrees) 0 &lt; if{ &apos;W&apos; } els{ &apos;E&apos; } )%!1s!%((L:B21_gpsnav_wp_long,degrees) abs)%!7.4f!</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WAYPOINT DATA Line 4">
+            <FloatPosition>26.000,152.000</FloatPosition>
+            <Visibility> (G:Var2) 2 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>EL:%((A:GPS IS ACTIVE WAY POINT, bool))%{if}%((E:UNITS OF MEASURE,enum) 2 &lt; if{ (L:B21_gpsnav_wp_alt,feet) } els{ (L:B21_gpsnav_wp_alt,meters) })%!4d!%{else}     %{end} SP:%((E:UNITS OF MEASURE,enum) 1 &lt; if{ (A:GPS GROUND SPEED,knots) } els{ (A:GPS GROUND SPEED,kph) })%!d!</GaugeString>
+                <Length>12</Length>
+                <Size>190,36</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WIND DATA Line 1">
+            <FloatPosition>26.000,56.000</FloatPosition>
+            <Visibility> (G:Var2) 3 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>LOCAL WIND</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WIND DATA Line 2">
+            <FloatPosition>26.000,88.000</FloatPosition>
+            <Visibility> (G:Var2) 3 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>FROM:%((A:SIM ON GROUND, bool) ! )%{if}%((A:AMBIENT WIND DIRECTION, degrees) (A:MAGVAR,degrees) - 360 + 360 % )%!3d!(MAG)%{end} </GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WIND DATA Line 3">
+            <FloatPosition>26.000,120.000</FloatPosition>
+            <Visibility> (G:Var2) 3 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>AT:%((A:SIM ON GROUND, bool) ! )%{if}%((E:UNITS OF MEASURE,enum) 1 &lt; if{ (A:AMBIENT WIND VELOCITY,knots) } els{ (A:AMBIENT WIND VELOCITY,m/s) })%!3d!%((E:UNITS OF MEASURE,enum) 1 &lt; if{ &apos;KTS&apos; } els{ &apos;MPS&apos; })%!3s!%{end}</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="WIND DATA Line 4">
+            <FloatPosition>26.000,152.000</FloatPosition>
+            <Visibility> (G:Var2) 3 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>REL WIND:%((A:SIM ON GROUND, bool) ! )%{if}%((A:AMBIENT WIND DIRECTION,degrees) (A:PLANE HEADING DEGREES TRUE,degrees) - 360 + 360 % flr )%!3d!%{end}</GaugeString>
+                <Length>12</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        
+        <Element id="CHRONOMETER Line 1">
+            <FloatPosition>26.000,56.000</FloatPosition>
+            <Visibility> (G:Var2) 4 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>CHRONOMETER</GaugeString>
+                <Length>25</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        <Element id="CHRONOMETER Line 2">
+            <FloatPosition>26.000,88.000</FloatPosition>
+            <Visibility> (G:Var2) 4 == </Visibility>
+            <GaugeText id="GaugeText">
+                <Charset>Default</Charset>
+                <FontFace>Quartz</FontFace>
+                <FontColor>#101010</FontColor>
+                <FontHeight>30</FontHeight>
+                <FontWeight>300</FontWeight>
+                <GaugeString>ET:%( (P:Absolute time, seconds) (G:Var8) - 86400 &gt; if{ (P:Absolute time, seconds) (&gt;G:Var8) } (P:Absolute time, seconds) (G:Var8) - 3600 / flr )%!02d!:%( (P:Absolute time, seconds) (G:Var8) - 3600 % 60 / flr )%!02d!:%( (P:Absolute time, seconds) (G:Var8) - 60 % )%!02d!</GaugeString>
+                <Length>25</Length>
+                <Size>190,30</Size>
+                <Transparent>True</Transparent>
+                <VerticalAlign>CENTER</VerticalAlign>
+            </GaugeText>
+        </Element>
+        
+        <MouseArea id="MouseArea">
+            <FloatPosition>0.000,0.000</FloatPosition>
+            <Size>242,244</Size>
+            <MouseArea id="Left">
+                <FloatPosition>10.000,196.000</FloatPosition>
+                <Size>52,48</Size>
+                <CursorType>Hand</CursorType>
+                <MouseClick id="MouseClick">
+                    <Script>(M:Event) &apos;LeftSingle&apos; scmp 0 == if{ 3 (G:Var2) + 4 % (&gt;G:Var2) 1 (&gt;G:Var3) } (M:Event) &apos;LeftRelease&apos; scmp 0 == if{ 0 (&gt;G:Var3) }</Script>
+                    <ClickType>LeftSingle+LeftRelease</ClickType>
+                </MouseClick>
+                <Tooltip id="Tooltip">
+                    <DefaultId>TOOLTIPTEXT_NAV_DISPLAY_LEFT</DefaultId>
+                </Tooltip>
+            </MouseArea>
+            <MouseArea id="Right">
+                <FloatPosition>180.000,196.000</FloatPosition>
+                <Size>52,48</Size>
+                <CursorType>Hand</CursorType>
+                <MouseClick id="MouseClick">
+                    <Script>(M:Event) &apos;LeftSingle&apos; scmp 0 == if{ 1 (G:Var2) + 4 % (&gt;G:Var2) 1 (&gt;G:Var4) } (M:Event) &apos;LeftRelease&apos; scmp 0 == if{ 0 (&gt;G:Var4) }</Script>
+                    <ClickType>LeftSingle+LeftRelease</ClickType>
+                </MouseClick>
+                <Tooltip id="Tooltip">
+                    <DefaultId>TOOLTIPTEXT_NAV_DISPLAY_RIGHT</DefaultId>
+                </Tooltip>
+            </MouseArea>
+            <MouseArea id="Up">
+                <FloatPosition>64.000,196.000</FloatPosition>
+                <Size>56,48</Size>
+                <CursorType>Hand</CursorType>
+                <MouseClick id="MouseClick">
+                    <ClickType>LeftSingle</ClickType>
+                    <Script>
+                        (G:Var2) 0 == if{
+                            (L:B21_gpsnav_active_wp, number) 1 + (C:fs9gps:FlightPlanwaypointsNumber, number) &lt; if{
+                                (L:B21_gpsnav_active_wp, number) ++ (&gt;L:B21_gpsnav_active_wp, number) 
+                            }
+                        }
+                    </Script>
+                </MouseClick>
+            </MouseArea>
+            <MouseArea id="Down">
+                <FloatPosition>124.000,196.000</FloatPosition>
+                <Size>54,48</Size>
+                <CursorType>Hand</CursorType>
+                <MouseClick id="MouseClick">
+                    <ClickType>LeftSingle</ClickType>
+                    <Script>
+                        (G:Var2) 0 == if{
+                            1 (&gt;L:B21_gpsnav_no_switch, bool)
+                            (L:B21_gpsnav_active_wp, number) 0 &gt; if{
+                                (L:B21_gpsnav_active_wp, number) -- (&gt;L:B21_gpsnav_active_wp, number)
+                            }
+                        }
+                    </Script>
+                </MouseClick>
+            </MouseArea>
+            <MouseArea id="Go">
+                <FloatPosition>150.000,0.000</FloatPosition>
+                <Size>76,50</Size>
+                <CursorType>Hand</CursorType>
+                <MouseClick id="MouseClick">
+                    <Script>(M:Event) &apos;LeftSingle&apos; scmp 0 == 
+if{ 1 (&gt;G:Var7) 0 (G:Var2) == 
+	if{ 4 (&gt;G:Var2) } 
+	els{ 4 (G:Var2) == 
+		if{ (P:Absolute time, seconds) 
+		(&gt;G:Var8) } els{ 0 (&gt;G:Var2) } 
+	}
+} 
+(M:Event) &apos;LeftRelease&apos; scmp 0 == if{ 0 (&gt;G:Var7) }</Script>
+                    <ClickType>LeftSingle+LeftRelease</ClickType>
+                </MouseClick>
+                <Tooltip id="Tooltip">
+                    <DefaultId>TOOLTIPTEXT_NAV_DISPLAY_GO</DefaultId>
+                </Tooltip>
+            </MouseArea>
+            <Tooltip id="Tooltip">
+                <DefaultId>TOOLTIPTEXT_NAV_DISPLAY</DefaultId>
+            </Tooltip>
+        </MouseArea>
+    </SimGauge.Gauge>
+</SimBase.Document>

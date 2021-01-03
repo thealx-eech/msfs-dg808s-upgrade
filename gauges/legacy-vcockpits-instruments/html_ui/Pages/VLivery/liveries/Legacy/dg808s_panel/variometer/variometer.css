@@ -146,14 +146,44 @@ gauges_dg808s_panel_2-element #variometer_flap_down_2 {
 		top: 25px;
 	}
 
-gauges_dg808s_panel_2-element #variometer_circling {
+gauges_dg808s_panel_2-element #variometer_mode_auto_climb {
 		background: transparent;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/circling_mode.png");
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/mode_auto_climb.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
 		/* display: none; */
+
+		width: 14px;
+		height: 11px;
+		left: 60px;
+		top: 42px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_mode_climb {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/mode_climb.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		display: none;
+
+		width: 14px;
+		height: 11px;
+		left: 60px;
+		top: 42px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_mode_cruise {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/mode_cruise.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		display: none;
 
 		width: 14px;
 		height: 11px;
