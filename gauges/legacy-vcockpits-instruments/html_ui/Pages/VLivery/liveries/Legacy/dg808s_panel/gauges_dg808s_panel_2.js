@@ -126,6 +126,42 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         }
     }
 
+    // **********************************************************************************************************************
+    // **********************************************************************************************************************
+    // ******* SOME UTILITY FUNCTIONS     ***********************************************************************************
+    // **********************************************************************************************************************
+    // **********************************************************************************************************************
+
+    // degrees to radians
+    rad(x) {
+          return x * Math.PI / 180;
+    }
+
+    // Return distance in m between positions p1 and p2.
+    // lat/longs in e.g. p1.lat etc (each as {lat: , lng: })
+    get_distance(p1, p2) {
+        var R = 6371000; // Earth's mean radius in meter
+        var dLat = this.rad(p2.lat - p1.lat);
+        var dLong = this.rad(p2.lng - p1.lng);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(this.rad(p1.lat)) * Math.cos(this.rad(p2.lat)) *
+                            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d; // returns the distance in meter
+    }
+
+    // Bearing in degrees from point p1 -> p2 (each as {lat: , lng: })
+    get_bearing(p1, p2) {
+        var a = { lat: this.rad(p1.lat), lng: this.rad(p1.lng) };
+        var b = { lat: this.rad(p2.lat), lng: this.rad(p2.lng) };
+
+        var y = Math.sin(b.lng-a.lng) * Math.cos(b.lat);
+        var x = Math.cos(a.lat)*Math.sin(b.lat) -
+                    Math.sin(a.lat)*Math.cos(b.lat)*Math.cos(b.lng-a.lng);
+        return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
     // Return interpolated result for 'value' using array 'lookup_table'
     // Where 'lookup_table' is array of [ value, result ] pairs (e.g. this.polar)
     interpolate(lookup_table, input_value) {
@@ -148,6 +184,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         return lookup_table[i-1][RESULT] + result_diff * value_ratio;
     }
+
+    // **********************************************************************************************************************
+    // **********************************************************************************************************************
+    // ******* SOARING FUNCTIONS         ***********************************************************************************
+    // **********************************************************************************************************************
+    // **********************************************************************************************************************
 
     // ************************************************************
     // polar_sink(airspeed m/s) returns sink m/s
@@ -345,7 +387,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     // Initialise values on power-on
     variometer_init() {
-        // Variometer (i.e. Cambridge) vars
+        this.variometer_init_time_s = this.time_s; // Flag for init() run
         this.variometer_mode_var = ["LIGHT BEACON ON","boolean"]; // Var to manual switch cruise/climb
         //this.variometer_mode_var = ["VARIOMETER SWITCH","boolean"]; // MSFS not implemented !!
         this.variometer_mode = "AUTO"; // CRUISE / CLIMB / AUTO
@@ -357,7 +399,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.variometer_altitude_start_m = 0;    // start height of cruise or climb
         this.variometer_update_time_s = null;    // time when digits on vario were last updated
         this.variometer_average_cruise_ms = 0;   // rolling average for cruise TE climb/sink value
-        this.variometer_init_time_s = this.time_s;
 
         // "88" as flaps display
         let flap_display = this.querySelector("#variometer_flap_display");
@@ -397,9 +438,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         const UPDATE_S = 3; // Update the digits on the display every 3 seconds
 
-        let needle_value = this.climb_mode ? this.te_ms : this.netto_ms;
-        this.variometer_display_needle(needle_value);
-
         // Update basic rolling average of TE climb/sink
         this.variometer_average_cruise_ms = 0.99 * this.variometer_average_cruise_ms + 0.01 * this.te_ms;
 
@@ -409,8 +447,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.variometer_update_time_s = this.time_s; // Initialize update time
         }
 
-        // Detect climb/cruise mode change. Update circling/mode indicator
         let vario_climb_mode = this.variometer_update_mode(); // vario_climb_mode will be true/false
+
+        let needle_value = vario_climb_mode ? this.te_ms : this.netto_ms;
+        this.variometer_display_needle(needle_value);
+
+        // Detect climb/cruise mode change
         // Also this.variometer_mode will have been set to "CRUISE" | "CLIMB" | "AUTO"
         if (vario_climb_mode != this.variometer_previous_climb_mode ||
                 this.variometer_mode != this.variometer_previous_mode) {
@@ -499,8 +541,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         } else if (this.variometer_mode == "CLIMB") {
             return_climb_mode = true;
         }
-        this.debug3 = this.variometer_mode;
-        this.debug4 = return_climb_mode;
+        //this.debug4 = return_climb_mode;
         return return_climb_mode;
     }
 
@@ -598,27 +639,148 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         down_2.style.display = flap_alert[1][1] ? "block" : "none";
     }
 
-    //******************************************************************************
-    //************** NAV INSTRUMENT     ********************************************
-    //******************************************************************************
-    nav_display_update(){
-        let top_el = this.querySelector("#nav_display_top");
-        let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
-        top_el.innerHTML = wp_id;
+    // *************************************************************************************************************************
+    //************** NAV INSTRUMENT     ****************************************************************************************
+    // *************************************************************************************************************************
 
+    nav_display_init() {
+        this.nav_display_init_time_s = this.time_s;
+        this.nav_display_next_var = ["LIGHT NAV ON","bool"]; // Toggling the var will select next WP
+        this.nav_display_previous_next_var = null;
+        this.nav_display_wp_index = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number");
+        this.nav_display_wp_count = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointsNumber", "number");
+        this.nav_display_previous_pointer_el = this.querySelector("#nav_display_all"); // start with all pointer elements lit
+        this.wp_position = null;
+    }
+
+    nav_display_update() {
+
+        // Startup
+        if (this.nav_display_init_time_s == null) {
+            this.nav_display_init();
+            return;
+        }
+
+        const POWER_UP_TIME_S = 10; // duration (sec) of full power-up sequence
+
+        // If we're inside the 'power up' time, we just animate the gauge
+        if (this.time_s - this.nav_display_init_time_s < POWER_UP_TIME_S) {
+            const CYCLE_TIME_S = 7;
+            const POWER_UP_DELAY_S = POWER_UP_TIME_S - CYCLE_TIME_S;
+            // 't' is time within CYCLE_TIME_S
+            let t = this.time_s - this.nav_display_init_time_s - POWER_UP_DELAY_S;
+            // Do nothing during the power-up delay period
+            if (t < 0) {
+                return;
+            }
+            // Sweep needle across full range -4, .. , +4
+            let pointer_value = Math.round(4 * Math.sin(t / CYCLE_TIME_S * 2 * Math.PI));
+            this.nav_display_pointer(pointer_value);
+            return;
+        }
+
+        const UPDATE_S = 3; // Update the digits on the display every 3 seconds
+
+        // Detect a nav_display_next_var toggle
+        let next_var = SimVar.GetSimVarValue(this.nav_display_next_var[0], this.nav_display_next_var[1]);
+        if (next_var != this.nav_display_previous_next_var) {
+            // User has toggled nav_display_next_var
+            this.nav_display_previous_next_var = next_var; // reset for next toggle
+            this.nav_display_wp_index += 1;
+            // Increment wp index, rotate back to 0 if at end.
+            if (this.nav_display_wp_index == this.nav_display_wp_count) {
+                this.nav_display_wp_index = 0;
+            }
+            SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_wp_index);
+
+            this.wp_position = { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
+                                 lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
+            };
+
+        }
+
+        // Display next WP id
+        let top_el = this.querySelector("#nav_display_top");
+        let wp_id = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIdent", "string");
+        //let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
+        let top_str = this.nav_display_wp_index+"."+wp_id;
+        if (top_str.length > 8) {
+            top_el.style["font-size"] = Math.floor(22 * (10/top_str.length))+"px";
+        } else {
+            top_el.style["font-size"] = "22px";
+        }
+        top_el.innerHTML = top_str;
+
+        // Display elevation of WP
         let middle_el = this.querySelector("#nav_display_middle");
-        let height = Math.floor(SimVar.GetSimVarValue("GPS TARGET ALTITUDE", "meters") * this.M_TO_FT);
+        //let height = Math.floor(SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters") * this.M_to_F);
+        let height = Math.floor(SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters") * this.M_TO_F);
         middle_el.innerHTML = height;
 
+        let position = { lat: SimVar.GetSimVarValue("GPS POSITION LAT", "degrees"),
+                         lng: SimVar.GetSimVarValue("GPS POSITION LON", "degrees")
+        };
+
+        // Display distance to WP
         let bottom_el = this.querySelector("#nav_display_bottom");
-        let distance = Math.floor(SimVar.GetSimVarValue("GPS WP DISTANCE", "meters") / 1000);
+        // Calculate distance to next WP, in Km and create display string e.g. "10" or "4.5"
+        let distance = this.get_distance(position, this.wp_position) / 1000; //SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointDistance", "meters") / 1000; // distance to WP in Km
+        if (distance >= 10) { // Above 10Km, just show whole Km
+            distance = Math.floor(distance + 0.5);
+        } else {             // Below 10Km, show decimals
+            distance = Math.floor(distance * 10 + 0.5) / 10;
+        }
+        if (distance == 0) {
+            distance = "0.0";
+        }
+        //let distance = Math.floor(SimVar.GetSimVarValue("GPS WP DISTANCE", "meters") / 1000);
         bottom_el.innerHTML = distance;
+
+        let bearing = this.get_bearing(position, this.wp_position);
+        this.debug2 = this.wp_position.lat.toFixed(4);//bearing.toFixed(1);
+        this.debug3 = this.wp_position.lng.toFixed(4);//bearing.toFixed(1);
+        this.debug4 = bearing.toFixed(1);
+        this.nav_display_pointer(2);
+
 
     } // end update_nav()
 
-    // ***********************************************************************************************************
-    // ********** DEBUG              *****************************************************************************
-    // ***********************************************************************************************************
+    // Update the nav display direction pointer arrows
+    // pointer is -4 .. +4 (any other number means all)
+    nav_display_pointer(pointer) {
+        this.nav_display_previous_pointer_el.style.display = "none";
+        let pointer_id = this.nav_display_pointer_to_id(pointer);
+        this.nav_display_previous_pointer_el = this.querySelector(pointer_id);
+        this.nav_display_previous_pointer_el.style.display = "block";
+    }
+
+    // Convert a pointer number -4 .. +4 into an element id to display.
+    nav_display_pointer_to_id(pointer) {
+        if (pointer == -4) {
+            return "#nav_display_4L";
+        } else if (pointer == -3) {
+            return "#nav_display_3L";
+        } else if (pointer == -2) {
+            return "#nav_display_2L";
+        } else if (pointer == -1) {
+            return "#nav_display_1L";
+        } else if (pointer == 0) {
+            return "#nav_display_zero";
+        } else if (pointer == 1) {
+            return "#nav_display_1R";
+        } else if (pointer == 2) {
+            return "#nav_display_2R";
+        } else if (pointer == 3) {
+            return "#nav_display_3R";
+        } else if (pointer == 4) {
+            return "#nav_display_4R";
+        }
+        return "#nav_display_all";
+    }
+
+    // ************************************************************************************************************************
+    // ********** DEBUG              ******************************************************************************************
+    // ************************************************************************************************************************
 
     debug_init() {
         // Debug refresh timer and smoothed flight parameters
@@ -677,7 +839,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             }
 
             //let jet_thrust = SimVar.GetSimVarValue("A:GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
-            this.debug2 = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]) ? "ON" : "OFF";
+            //this.debug2 = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]) ? "ON" : "OFF";
+            //this.debug2 = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number")+"/"+
+            //    SimVar.GetSimVarValue("C:fs9gps:FlightPlanwaypointsNumber", "number");
             debug_el = this.querySelector("#debug2");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
@@ -685,6 +849,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             }
 
             //this.debug3 = SimVar.GetSimVarValue("A:AIRCRAFT WIND Y", "knots").toFixed(2);
+            //this.debug3 = SimVar.GetSimVarValue("GPS WP NEXT ALT", "meters");
+            //this.debug3 = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters").toFixed(0);
             debug_el = this.querySelector("#debug3");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
@@ -702,18 +868,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // ***********************
 
             // DEBUG GLIDE RATIO (max 99)
-            this.debug5 = Math.floor(this.debug_glide_ratio + 0.5);
+            this.debug5 = "";
             debug_el = this.querySelector("#debug5");
-            if (false && typeof debug_el !== "undefined") {
+            if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.style["font-size"] = "28px";
                 debug_el.style.height = "30px";
                 debug_el.style.width = "30px";
-                debug_el.style.color = this.debug_glide_ratio == 99 ? "pink" :"black";
+                debug_el.style.color = "white";
                 debug_el.innerHTML = this.debug5;
             }
             // DEBUG AIRSPEED KPH
-            this.debug6 = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
+            this.debug6 = ""; //SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
             debug_el = this.querySelector("#debug6");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
@@ -725,6 +891,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // DEBUG FLAPS INDEX
             //For flight model testing
             let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
+            this.debug7 = Math.floor(this.debug_glide_ratio + 0.5);
             debug_el = this.querySelector("#debug7");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
@@ -733,17 +900,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
                 debug_el.style.height = "30px";
                 debug_el.style.width = "10px";
                 //debug_el.style["font-family"] = "Roboto-Regular";
-                debug_el.innerHTML = ""+flaps_index;
+                debug_el.innerHTML = this.debug7;
             }
             // DEBUG TOTAL ENERGY SINK
+            let te = this.te_ms; // to shorten next line
+            this.debug8 = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
             debug_el = this.querySelector("#debug8");
             if (typeof debug_el !== "undefined") {
                 debug_el.style.display = "block";
                 debug_el.style["font-size"] = "28px";
                 debug_el.style.color = "white";
                 debug_el.style.height = "36px";
-                let te = this.te_ms; // to shorten next line
-                debug_el.innerHTML = "  "+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
+                debug_el.innerHTML = this.debug8;
             }
         }
     } // end update_debug

@@ -11,29 +11,32 @@ gauges_dg808s_panel_2-element #nav_display {
 		height: 122px;
 }
 
-gauges_dg808s_panel_2-element #nav_display_top {
+gauges_dg808s_panel_2-element #nav_display_top_div {
+		left: 11px;
+		top: 20px;
+		width: 100px;
+		height: 24px;
 		background: transparent;
 		position: absolute;
 		overflow: hidden;
-		width: 100px;
-		height: 24px;
-		left: 11px;
-		top: 20px;
 		white-space: nowrap;
         overflow: hidden;
 		color: #000000;
 		font-size: 22px;
-		overflow: hidden;
         max-width: 25ch;
-		vertical-align: center;
+		vertical-align: middle;
         text-align: center;
+}
+
+gauges_dg808s_panel_2-element #nav_display_top {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 gauges_dg808s_panel_2-element #nav_display_middle {
 		background: transparent;
 		position: absolute;
 		overflow: hidden;
-        display: none;
 		width: 100px;
 		height: 24px;
 		left: 11px;
@@ -43,9 +46,8 @@ gauges_dg808s_panel_2-element #nav_display_middle {
 		color: #000000;
 		font-family: "Quartz";
 		font-size: 22px;
-		overflow: hidden;
         max-width: 25ch;
-		vertical-align: center;
+		vertical-align: middle;
         text-align: center;
 }
 
@@ -63,20 +65,136 @@ gauges_dg808s_panel_2-element #nav_display_bottom {
 		color: #000000;
 		font-family: "Quartz";
 		font-size: 22px;
-		overflow: hidden;
         max-width: 25ch;
-		vertical-align: center;
+		vertical-align: middle;
         text-align: center;
 }
 
-gauges_dg808s_panel_2-element #nav_display_pointer0 {
+gauges_dg808s_panel_2-element #nav_display_4L {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/4L.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_3L {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/3L.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_2L {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/2L.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_1L {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/1L.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_zero {
 		background: transparent;
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/zero.png");
 		background-position: 0px 0px;
 		background-repeat: no-repeat;
 		position: absolute;
 		overflow: hidden;
-        /*display: none; */
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_1R {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/1R.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_2R {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/2R.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_3R {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/3R.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_4R {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/4R.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: none;
+		height: 12px;
+		top: 44px;
+		width: 95px;
+		left: 11px;
+	}
+gauges_dg808s_panel_2-element #nav_display_all {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/all.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        display: block;
 		height: 12px;
 		top: 44px;
 		width: 95px;
