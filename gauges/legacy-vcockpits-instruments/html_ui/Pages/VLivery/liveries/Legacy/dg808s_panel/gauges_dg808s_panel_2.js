@@ -82,7 +82,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.total_energy_update();
         this.netto_update();
         this.climb_mode_update();
-        this.vario_tone_update();
 
         // Now update instruments
         this.winter_update();
@@ -328,18 +327,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     //******************************************************************************
-    //************** VARIO TONE       **********************************************
-    //******************************************************************************
-    vario_tone_update() {
-		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") && SimVar.GetSimVarValue("A:GENERAL ENG MASTER ALTERNATOR:1", "bool")) {
-            let climb_rate = this.climb_mode ? this.te_ms : this.netto_ms;
-            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", climb_rate * this.MS_TO_FPM);
-        } else {
-            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0);
-        }
-    }
-
-    //******************************************************************************
     //******************************************************************************
     //************** INSTRUMENT UPDATES     ****************************************
     //******************************************************************************
@@ -389,17 +376,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Initialise values on power-on
     variometer_init() {
         this.variometer_init_time_s = this.time_s; // Flag for init() run
+        this.variometer_update_time_s = null;    // time when digits on vario were last updated
         this.variometer_mode_var = ["LIGHT BEACON ON","boolean"]; // Var to manual switch cruise/climb
         //this.variometer_mode_var = ["VARIOMETER SWITCH","boolean"]; // MSFS not implemented !!
         this.variometer_mode = "AUTO"; // CRUISE / CLIMB / AUTO
         this.variometer_previous_mode = "AUTO";
         this.variometer_previous_switch = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]);
         this.variometer_previous_climb_mode = null; // will be boolean true => climb, false => cruise
-        this.variometer_average_ms = 0;          // current average reading (m/s)
-        this.variometer_mode_time_s = null;      // MSFS timestamp when climb/cruise started
+        this.variometer_average_te_ms = 0;    // rolling average (m/s) for TE
+        this.variometer_average_netto_ms = 0; // rolling average (m/s) for NETTO
+        this.variometer_previous_average_ms = 0; // Cached previous average value for comparison indicators
+        this.variometer_mode_time_s = this.time_s;      // MSFS timestamp when climb/cruise started
         this.variometer_altitude_start_m = 0;    // start height of cruise or climb
-        this.variometer_update_time_s = null;    // time when digits on vario were last updated
-        this.variometer_average_cruise_ms = 0;   // rolling average for cruise TE climb/sink value
 
         // "88" as flaps display
         let flap_display = this.querySelector("#variometer_flap_display");
@@ -440,7 +428,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         const UPDATE_S = 3; // Update the digits on the display every 3 seconds
 
         // Update basic rolling average of TE climb/sink
-        this.variometer_average_cruise_ms = 0.99 * this.variometer_average_cruise_ms + 0.01 * this.te_ms;
+        this.variometer_average_te_ms = 0.99 * this.variometer_average_te_ms + 0.01 * this.te_ms;
+
+        // Update basic rolling average of NETTO climb/sink
+        this.variometer_average_netto_ms = 0.99 * this.variometer_average_netto_ms + 0.01 * this.netto_ms;
 
         // On startup write a zero the the averager display
         if (this.variometer_update_time_s == null) {
@@ -450,8 +441,14 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         let vario_climb_mode = this.variometer_update_mode(); // vario_climb_mode will be true/false
 
-        let needle_value = vario_climb_mode ? this.te_ms : this.netto_ms;
-        this.variometer_display_needle(needle_value);
+        let needle_value_ms = vario_climb_mode ? this.te_ms : this.netto_ms;
+        this.variometer_display_needle(needle_value_ms);
+
+        this.variometer_tone_update(needle_value_ms);
+
+        // Update the flap indicator
+        let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
+        this.variometer_display_flap(flap_index);
 
         // Detect climb/cruise mode change
         // Also this.variometer_mode will have been set to "CRUISE" | "CLIMB" | "AUTO"
@@ -462,7 +459,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.variometer_altitude_start_m = this.altitude_m;
             this.variometer_previous_climb_mode = vario_climb_mode;
             this.variometer_previous_mode = this.variometer_mode;
-            this.variometer_average_cruise_ms = 0;
+            this.variometer_average_netto_ms = 0; // Always reset the averages when we switch mode
+            this.variometer_average_te_ms = 0;
 
             // Set/hide circling/TE/N indicators
             let variometer_auto_climb_el = this.querySelector("#variometer_mode_auto_climb");
@@ -489,30 +487,46 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         // Update the digits on the vario display (e.g. averager)
         if (this.time_s - this.variometer_update_time_s > UPDATE_S) {
-            let average_comparator_ms = Math.round(this.variometer_average_ms*10) / 10;
             this.variometer_update_time_s = this.time_s;
-            // Calculate averager reading m/s
-            if (vario_climb_mode) {
+
+            let average_ms;
+            // Calculate averager reading m/s in each variometer mode, i.e.
+            //    "AUTO" -> rolling NETTO in cruise, or TRUE CLIMB in climb.
+            //    "CRUISE" -> rolling NETTO
+            //    "CLIMB" -> rolling TE
+            if (this.variometer_mode == "AUTO" && vario_climb_mode ) {
                 let climb_duration_s = this.time_s - this.variometer_mode_time_s;
                 // avoid divide by zero
                 if (climb_duration_s > 2) {
                     // Note we could adjust for Kinetic Energy loss
-                    this.variometer_average_ms = (this.altitude_m - this.variometer_altitude_start_m) / climb_duration_s;
+                    average_ms = (this.altitude_m - this.variometer_altitude_start_m) / climb_duration_s;
+                } else {
+                    return;
                 }
-            } else { // Cruise mode
-                this.variometer_average_ms = this.variometer_average_cruise_ms;
+            } else if (this.variometer_mode == "CLIMB") { // Fixed 'CLIMB' mode
+                average_ms = this.variometer_average_te_ms;
+            } else {
+                average_ms = this.variometer_average_netto_ms;
             }
 
-            let current_average = Math.round(this.variometer_average_ms*10) / 10;
-            let increasing = current_average > average_comparator_ms;
-            let decreasing = current_average < average_comparator_ms;
+            average_ms = Math.round(average_ms*10) / 10;
+            let increasing = average_ms > this.variometer_previous_average_ms;
+            let decreasing = average_ms < this.variometer_previous_average_ms;
 
-            this.variometer_display_average(this.variometer_average_ms, increasing, decreasing);
+            this.variometer_previous_average_ms = average_ms; // Store current average for next comparison
+
+            this.variometer_display_average(average_ms, increasing, decreasing);
         }
 
-        // Update the flap indicator
-        let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
-        this.variometer_display_flap(flap_index);
+    }
+
+    // VARIO TONE
+    variometer_tone_update(needle_value_ms) {
+		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) {
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", needle_value_ms * this.MS_TO_FPM);
+        } else {
+            SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0);
+        }
     }
 
     // Toggle the variometer between CRUISE -> CLIMB -> AUTO, and return true/false for climb mode:
@@ -565,12 +579,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     // Update the variometer average display area with average (float), and increasing/decreasing indicators (booleans)
-    variometer_display_average(display_value, increasing, decreasing) {
+    variometer_display_average(display_value_ms, increasing, decreasing) {
         // Update averager reading
         let averager_digits_el = this.querySelector("#variometer_averager_digits");
         let averager_decimal_el = this.querySelector("#variometer_averager_decimal");
 		if (typeof averager_digits_el !== "undefined" && typeof averager_decimal_el !== "undefined") {
-            let v = Math.round(display_value * 10);
+            let v = Math.round(display_value_ms * this.MS_TO_KT * 10);
             let digits =  Math.trunc(v/10);
             let decimal = Math.abs(v % 10);
             // Note no "-" in front of 0.0 (e.g. from display value -0.04)
@@ -656,6 +670,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.nav_display_bottom_el = this.querySelector("#nav_display_bottom");
 
         // Flightplan info
+        this.nav_display_flightplan_request = false; // Flag when FlightPlanWaypointIndex updated
         this.nav_display_flightplan_active = SimVar.GetSimVarValue("C:fs9gps:FlightPlanIsActiveFlightPlan","bool");
 
         // Aircraft data
@@ -680,9 +695,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.nav_display_bottom_el.innerHTML = "8888";
     }
 
+    // Update function for nav_display, called on each sim update loop
     nav_display_update() {
 
-        // Startup
+        // On startup -just call init()
         if (this.nav_display_init_time_s == null) {
             this.nav_display_init();
             return;
@@ -706,8 +722,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             return;
         }
 
-        const UPDATE_S = 3; // Update the digits on the display every 3 seconds
-
         // ************************************************************
         // Detect a nav_display_next_var toggle - SELECT NEXT WAYPOINT
         // ************************************************************
@@ -722,6 +736,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             }
             // IMPORTANT: here we tell MSFS to change to next flightplan waypoint to index this.nav_display_wp_index
             this.nav_display_set_wp();
+            return; // Skip to next update cycle and call nav_display_get_wp();
+        }
+
+        // If we have a pending FlightPlanWaypointIndex update, collect the data
+        if (this.nav_display_flightplan_request) {
+            this.nav_display_get_wp();
         }
 
         // Display next WP id
@@ -760,6 +780,18 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     } // end nav_display_update()
 
+    nav_display_update_top_str() {
+        // Display next WP id
+        //let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
+        let top_str = (this.nav_display_wp_index == 0 ? "" : this.nav_display_wp_index+".")+this.nav_display_wp_name;
+        if (top_str.length > 8) {
+            this.nav_display_top_el.style["font-size"] = Math.floor(22 * (8/top_str.length))+"px";
+        } else {
+            this.nav_display_top_el.style["font-size"] = "22px";
+        }
+        this.nav_display_top_el.innerHTML = top_str;
+    }
+
     // Return { lat: lng: } for current position of aircraft
     nav_display_get_position() {
         return { lat: SimVar.GetSimVarValue("A:PLANE LATITUDE", "radians") * this.RAD_TO_DEG,
@@ -767,13 +799,19 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         };
     }
 
-    // Set the waypoint info for the current waypoint
-    // If no flightplan, then return aircraft position info
-    nav_display_set_wp() {
 
+    // Set the waypoint index and flag a 'request' is now outstanding
+    nav_display_set_wp() {
+        this.nav_display_flightplan_request = true;
         if (this.nav_display_flightplan_active) {
             SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_wp_index);
+        }
+    }
 
+    // Collect waypoint info from earlier FlightPlanWaypointIndex update
+    // If no flightplan, then return aircraft position info
+    nav_display_get_wp() {
+        if (this.nav_display_flightplan_active) {
             this.nav_display_wp_position = { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
                                              lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
             };
@@ -787,6 +825,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.nav_display_wp_alt_m = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters");
             this.nav_display_wp_type = 5;
         }
+        this.nav_display_flightplan_request = false;
     }
 
     // Given a waypoint bearing, calculate the -3..+3 value for the pointer
@@ -918,9 +957,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
             // ASI
             this.debug[1] = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
-            this.debug[2] = ""; //this.nav_display_wp_position.lat.toFixed(4);
-            this.debug[3] = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters").toFixed(0); //""; //this.nav_display_wp_position.lng.toFixed(4);//bearing.toFixed(1);
-            this.debug[4] = (SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG).toFixed(0);
+            this.debug[2] = "";//this.nav_display_wp_position.lat.toFixed(4);
+            this.debug[3] = (SimVar.GetSimVarValue("VELOCITY WORLD Y", "feet per second")/this.M_TO_F).toFixed(2); //""; //this.nav_display_wp_position.lng.toFixed(4);//bearing.toFixed(1);
+            this.debug[4] = (SimVar.GetSimVarValue("GROUND VELOCITY", "knots")/this.MS_TO_KT*this.MS_TO_KPH).toFixed(1);//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG).toFixed(0);
 
 
             // nav_display
@@ -931,7 +970,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
             // Winter
             this.debug[9] = this.nav_display_flightplan_active ? "FP:ON" : "FP:OFF";
-            this.debug[10] = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex","bool");
+            this.debug[10] = "";//SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex","bool");
             this.debug[11] = "";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK", "radians") * this.RAD_TO_DEG).toFixed(0);
             let te = this.te_ms; // to shorten next line
             this.debug[12] = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));

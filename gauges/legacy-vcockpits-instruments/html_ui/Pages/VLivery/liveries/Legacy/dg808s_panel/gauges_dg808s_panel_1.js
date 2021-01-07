@@ -36,7 +36,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         this.update_radio();
         this.update_transponder();
         this.update_compass();
-        this.update_label();
+        this.update_trim();
     }
 
     /*playInstrumentSound(soundId) {
@@ -623,14 +623,19 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     }
 
     //***********************************************************************************
-    //***********  LABEL      *********************************************************
+    //***********  trim      *********************************************************
     //***********************************************************************************
-    update_label() {
-        let label = this.querySelector("#label");
-		if (typeof label !== "undefined") {
-            let flap_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
-            let flap_name = [ "-3", "-2", "-1", "0", "T1", "T2", "L" ][flap_index];
-            label.innerHTML = flap_name;
+    update_trim() {
+        let trim_gear_down_el = this.querySelector("#trim_gear_down");
+		if (typeof trim_gear_down_el !== "undefined") {
+            let gear_position = SimVar.GetSimVarValue("A:GEAR HANDLE POSITION", "bool"); // true = GEAR DOWN
+            trim_gear_down_el.style.display = gear_position ? "block" : "none";
+		}
+        let pointer_el = this.querySelector("#trim_pointer");
+		if (typeof pointer_el !== "undefined") {
+            const SCALE_WIDTH = 80; // pixel width of scale line
+            let trim_amount = (-SimVar.GetSimVarValue("A:ELEVATOR TRIM PCT", "number") * SCALE_WIDTH / 2).toFixed(0);
+            pointer_el.style.transform = 'translate('+trim_amount+'px)';
 		}
     }
 

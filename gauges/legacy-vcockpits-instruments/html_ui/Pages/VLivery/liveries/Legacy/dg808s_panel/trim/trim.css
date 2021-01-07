@@ -1,0 +1,41 @@
+
+/* Trim gauge (incl. gear down warning) */
+
+gauges_dg808s_panel_1-element #trim {
+		position: absolute;
+		overflow: hidden;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		left: 2px;
+		top: 230px;
+		width: 84px;
+		height: 20px;
+}
+
+gauges_dg808s_panel_1-element #trim_gear_down {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/gear_down.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		/* display: none; */
+		left: 0px;
+		top: 4px;
+		width: 84px;
+		height: 10px;
+}
+
+gauges_dg808s_panel_1-element #trim_pointer {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/pointer.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		left: 37px;
+		top: 14px;
+		width: 9px;
+		height: 9px;
+}
