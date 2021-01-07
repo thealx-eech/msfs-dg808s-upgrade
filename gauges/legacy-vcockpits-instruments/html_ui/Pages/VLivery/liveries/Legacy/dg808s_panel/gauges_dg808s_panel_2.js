@@ -18,9 +18,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         super();
         // Constants
         this.MS_TO_KT = 1.94384; // speed conversion consts
-        this.MS_TO_KPH = 3.6;
-        this.M_TO_F = 3.28084; // meter to foot
+        this.MS_TO_KPH = 3.6;    // meter per second to kilometer per hour
+        this.M_TO_F = 3.28084;   // meter to foot
         this.MS_TO_FPM = 196.85; // meter per second to foot per minute
+        this.RAD_TO_DEG = 57.295; // Radians to degrees
 
         this.location = "interior";
         this.curTime = 0.0;
@@ -645,12 +646,38 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     nav_display_init() {
         this.nav_display_init_time_s = this.time_s;
+
         this.nav_display_next_var = ["LIGHT NAV ON","bool"]; // Toggling the var will select next WP
-        this.nav_display_previous_next_var = null;
-        this.nav_display_wp_index = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number");
+        this.nav_display_previous_next_var = SimVar.GetSimVarValue(this.nav_display_next_var[0], this.nav_display_next_var[1]);
+
+        // Display elements
+        this.nav_display_top_el = this.querySelector("#nav_display_top");
+        this.nav_display_middle_el = this.querySelector("#nav_display_middle");
+        this.nav_display_bottom_el = this.querySelector("#nav_display_bottom");
+
+        // Flightplan info
+        this.nav_display_flightplan_active = SimVar.GetSimVarValue("C:fs9gps:FlightPlanIsActiveFlightPlan","bool");
+
+        // Aircraft data
+        this.nav_display_position = this.nav_display_get_position(); // gets { lat:.., lng:.. } for aircraft position
+
+        // Waypoint data
+        this.nav_display_wp_index = 0;
+        this.nav_display_wp_position;
+        this.nav_display_wp_nam;
+        this.nav_display_wp_alt_m;
+        this.nav_display_wp_type;
+        this.nav_display_wp_bearing = 0;
+
+        this.nav_display_set_wp(); // Set current waypoint info for flightplan index this.nav_display_wp_index
+
         this.nav_display_wp_count = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointsNumber", "number");
+        // Gauge needs to hide previous displayed pointer element
         this.nav_display_previous_pointer_el = this.querySelector("#nav_display_all"); // start with all pointer elements lit
-        this.wp_position = null;
+
+        this.nav_display_top_el.innerHTML = "B21-NAV";
+        this.nav_display_middle_el.innerHTML = "8888";
+        this.nav_display_bottom_el.innerHTML = "8888";
     }
 
     nav_display_update() {
@@ -673,80 +700,136 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             if (t < 0) {
                 return;
             }
-            // Sweep needle across full range -4, .. , +4
-            let pointer_value = Math.round(4 * Math.sin(t / CYCLE_TIME_S * 2 * Math.PI));
+            // Sweep needle across full range -3, .. , +3
+            let pointer_value = Math.round(3 * Math.sin(Math.PI / 2 + t / CYCLE_TIME_S * 3 * Math.PI / 2));
             this.nav_display_pointer(pointer_value);
             return;
         }
 
         const UPDATE_S = 3; // Update the digits on the display every 3 seconds
 
-        // Detect a nav_display_next_var toggle
+        // ************************************************************
+        // Detect a nav_display_next_var toggle - SELECT NEXT WAYPOINT
+        // ************************************************************
         let next_var = SimVar.GetSimVarValue(this.nav_display_next_var[0], this.nav_display_next_var[1]);
-        if (next_var != this.nav_display_previous_next_var) {
+        if (this.nav_display_flightplan_active && next_var != this.nav_display_previous_next_var) {
             // User has toggled nav_display_next_var
             this.nav_display_previous_next_var = next_var; // reset for next toggle
             this.nav_display_wp_index += 1;
             // Increment wp index, rotate back to 0 if at end.
-            if (this.nav_display_wp_index == this.nav_display_wp_count) {
+            if (this.nav_display_wp_index >= this.nav_display_wp_count) {
                 this.nav_display_wp_index = 0;
             }
-            SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_wp_index);
-
-            this.wp_position = { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
-                                 lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
-            };
-
+            // IMPORTANT: here we tell MSFS to change to next flightplan waypoint to index this.nav_display_wp_index
+            this.nav_display_set_wp();
         }
 
         // Display next WP id
-        let top_el = this.querySelector("#nav_display_top");
-        let wp_id = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIdent", "string");
         //let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
-        let top_str = this.nav_display_wp_index+"."+wp_id;
+        let top_str = (this.nav_display_wp_index == 0 ? "" : this.nav_display_wp_index+".")+this.nav_display_wp_name;
         if (top_str.length > 8) {
-            top_el.style["font-size"] = Math.floor(22 * (10/top_str.length))+"px";
+            this.nav_display_top_el.style["font-size"] = Math.floor(22 * (8/top_str.length))+"px";
         } else {
-            top_el.style["font-size"] = "22px";
+            this.nav_display_top_el.style["font-size"] = "22px";
         }
-        top_el.innerHTML = top_str;
+        this.nav_display_top_el.innerHTML = top_str;
 
         // Display elevation of WP
-        let middle_el = this.querySelector("#nav_display_middle");
         //let height = Math.floor(SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters") * this.M_to_F);
-        let height = Math.floor(SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters") * this.M_TO_F);
-        middle_el.innerHTML = height;
+        let middle_str = Math.floor(this.nav_display_wp_alt_m * this.M_TO_F + 0.5);
+        this.nav_display_middle_el.innerHTML = middle_str;
 
-        let position = { lat: SimVar.GetSimVarValue("GPS POSITION LAT", "degrees"),
-                         lng: SimVar.GetSimVarValue("GPS POSITION LON", "degrees")
-        };
+        let position = this.nav_display_get_position();
 
         // Display distance to WP
-        let bottom_el = this.querySelector("#nav_display_bottom");
         // Calculate distance to next WP, in Km and create display string e.g. "10" or "4.5"
-        let distance = this.get_distance(position, this.wp_position) / 1000; //SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointDistance", "meters") / 1000; // distance to WP in Km
+        let distance = this.get_distance(position, this.nav_display_wp_position) / 1000; //SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointDistance", "meters") / 1000; // distance to WP in Km
         if (distance >= 10) { // Above 10Km, just show whole Km
-            distance = Math.floor(distance + 0.5);
+            distance = distance.toFixed(0);
         } else {             // Below 10Km, show decimals
-            distance = Math.floor(distance * 10 + 0.5) / 10;
-        }
-        if (distance == 0) {
-            distance = "0.0";
+            distance = distance.toFixed(1);
         }
         //let distance = Math.floor(SimVar.GetSimVarValue("GPS WP DISTANCE", "meters") / 1000);
-        bottom_el.innerHTML = distance;
+        this.nav_display_bottom_el.innerHTML = distance;
 
-        let bearing = this.get_bearing(position, this.wp_position);
-        this.debug2 = this.wp_position.lat.toFixed(4);//bearing.toFixed(1);
-        this.debug3 = this.wp_position.lng.toFixed(4);//bearing.toFixed(1);
-        this.debug4 = bearing.toFixed(1);
-        this.nav_display_pointer(2);
+        this.nav_display_wp_bearing = this.get_bearing(position, this.nav_display_wp_position);
 
+        let pointer = this.nav_display_bearing_to_pointer(this.nav_display_wp_bearing);
 
-    } // end update_nav()
+        this.nav_display_pointer(pointer);
+
+    } // end nav_display_update()
+
+    // Return { lat: lng: } for current position of aircraft
+    nav_display_get_position() {
+        return { lat: SimVar.GetSimVarValue("A:PLANE LATITUDE", "radians") * this.RAD_TO_DEG,
+                 lng: SimVar.GetSimVarValue("A:PLANE LONGITUDE", "radians") * this.RAD_TO_DEG
+        };
+    }
+
+    // Set the waypoint info for the current waypoint
+    // If no flightplan, then return aircraft position info
+    nav_display_set_wp() {
+
+        if (this.nav_display_flightplan_active) {
+            SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_wp_index);
+
+            this.nav_display_wp_position = { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
+                                             lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
+            };
+
+            this.nav_display_wp_name = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIdent", "string");
+            this.nav_display_wp_alt_m = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters");
+            this.nav_display_wp_type = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointType", "number");
+        } else {
+            this.nav_display_wp_position = this.nav_display_get_position();
+            this.nav_display_wp_name = "HOME";
+            this.nav_display_wp_alt_m = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters");
+            this.nav_display_wp_type = 5;
+        }
+    }
+
+    // Given a waypoint bearing, calculate the -3..+3 value for the pointer
+    nav_display_bearing_to_pointer(wp_bearing) {
+        // Get aircraft heading either from compass (if slow/stationary) or GPS TRACK
+        let aircraft_heading;
+        if (this.airspeed_ms < 15) {
+            aircraft_heading = SimVar.GetSimVarValue("PLANE HEADING DEGREES TRUE", "radians") * this.RAD_TO_DEG;
+        } else {
+            aircraft_heading = SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG;
+        }
+
+        // Convert aircraft_heading and wp_bearing into +180..-180 degrees offset of WP from aircraft heading (turn_deg)
+        let heading_delta_deg =  aircraft_heading - wp_bearing;
+
+        let left_deg;
+        let right_deg;
+        if (heading_delta_deg > 0) {
+            left_deg = heading_delta_deg;
+            right_deg = 360 - heading_delta_deg;
+        } else {
+            left_deg = heading_delta_deg + 360;
+            right_deg = -heading_delta_deg;
+        }
+        let turn_deg;
+        if (left_deg < right_deg) turn_deg = -left_deg;
+        else turn_deg = right_deg;
+
+        // Convert turn_deg to pointer value -3..+3 - note this is NOT linear.
+        let pointer;
+        if (turn_deg < -50) pointer = -3;
+        else if (turn_deg < -25) pointer = -2;
+        else if (turn_deg < -8) pointer = -1;
+        else if (turn_deg < 8) pointer = 0;
+        else if (turn_deg < 25) pointer = 1;
+        else if (turn_deg < 50) pointer = 2;
+        else pointer = 3;
+
+        return pointer;
+    }
 
     // Update the nav display direction pointer arrows
-    // pointer is -4 .. +4 (any other number means all)
+    // pointer is -3 .. +3 (any other number means all)
     nav_display_pointer(pointer) {
         this.nav_display_previous_pointer_el.style.display = "none";
         let pointer_id = this.nav_display_pointer_to_id(pointer);
@@ -755,6 +838,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     // Convert a pointer number -4 .. +4 into an element id to display.
+    // Note current range is -3..+3 but kept this way for possible future update.
     nav_display_pointer_to_id(pointer) {
         if (pointer == -4) {
             return "#nav_display_4L";
@@ -784,6 +868,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     debug_init() {
         // Debug refresh timer and smoothed flight parameters
+        this.debug = []; // variables set in gauges to be displayed in debug areas on panel
         this.debug_update_time_s = this.time_s;
         this.debug_enabled = false;
         this.debug_glide_ratio = 50;
@@ -800,10 +885,11 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         }
 
         // Debug display properties (heavily smoothed)
-        this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * this.airspeed_ms;
+        let airspeed_true_ms = SimVar.GetSimVarValue("AIRSPEED TRUE", "knots") / this.MS_TO_KT;
+        this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * airspeed_true_ms;
         this.debug_te_ms = 0.98 * this.debug_te_ms + 0.02 * this.te_raw_ms;
         // Guard against divide by zero and irrelevant high L/D in lift
-        let glide_ratio = this.te_raw_ms < -0.1 ? -this.airspeed_ms / this.te_raw_ms : 99;
+        let glide_ratio = this.te_raw_ms < -0.1 ? -airspeed_true_ms / this.te_raw_ms : 99;
         this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
 
         // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
@@ -830,124 +916,46 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // ASI DEBUG AREAS
             // ***************
 
-            this.debug1 = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
-            let debug_el = this.querySelector("#debug1");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style.width = "80px";
-                debug_el.innerHTML = this.debug1; //this.netto_ms.toFixed(2);
-            }
+            // ASI
+            this.debug[1] = Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
+            this.debug[2] = ""; //this.nav_display_wp_position.lat.toFixed(4);
+            this.debug[3] = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters").toFixed(0); //""; //this.nav_display_wp_position.lng.toFixed(4);//bearing.toFixed(1);
+            this.debug[4] = (SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG).toFixed(0);
 
-            //let jet_thrust = SimVar.GetSimVarValue("A:GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
-            //this.debug2 = SimVar.GetSimVarValue(this.variometer_mode_var[0], this.variometer_mode_var[1]) ? "ON" : "OFF";
-            //this.debug2 = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number")+"/"+
-            //    SimVar.GetSimVarValue("C:fs9gps:FlightPlanwaypointsNumber", "number");
-            debug_el = this.querySelector("#debug2");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.innerHTML = this.debug2;
-            }
 
-            //this.debug3 = SimVar.GetSimVarValue("A:AIRCRAFT WIND Y", "knots").toFixed(2);
-            //this.debug3 = SimVar.GetSimVarValue("GPS WP NEXT ALT", "meters");
-            //this.debug3 = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters").toFixed(0);
-            debug_el = this.querySelector("#debug3");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.innerHTML = this.debug3;
-            }
-            //this.debug4 = "Y";
-            debug_el = this.querySelector("#debug4");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.innerHTML = this.debug4;
-            }
+            // nav_display
+            this.debug[5] = "";
+            this.debug[6] = "";
+            this.debug[7] = Math.floor(this.debug_glide_ratio + 0.5);
+            this.debug[8] = this.nav_display_wp_bearing.toFixed(0);
 
-            // ***********************
-            // NAV_DISPLAY DEBUG AREAS
-            // ***********************
-
-            // DEBUG GLIDE RATIO (max 99)
-            this.debug5 = "";
-            debug_el = this.querySelector("#debug5");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.height = "30px";
-                debug_el.style.width = "30px";
-                debug_el.style.color = "white";
-                debug_el.innerHTML = this.debug5;
-            }
-            // DEBUG AIRSPEED KPH
-            this.debug6 = ""; //SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
-            debug_el = this.querySelector("#debug6");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "24px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "24px";
-                debug_el.innerHTML = this.debug6;
-            }
-            // DEBUG FLAPS INDEX
-            //For flight model testing
-            let flaps_index = SimVar.GetSimVarValue("A:FLAPS HANDLE INDEX", "number");
-            this.debug7 = Math.floor(this.debug_glide_ratio + 0.5);
-            debug_el = this.querySelector("#debug7");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.color = "blue";
-                debug_el.style.height = "30px";
-                debug_el.style.width = "10px";
-                //debug_el.style["font-family"] = "Roboto-Regular";
-                debug_el.innerHTML = this.debug7;
-            }
-            // DEBUG TOTAL ENERGY SINK
+            // Winter
+            this.debug[9] = this.nav_display_flightplan_active ? "FP:ON" : "FP:OFF";
+            this.debug[10] = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex","bool");
+            this.debug[11] = "";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK", "radians") * this.RAD_TO_DEG).toFixed(0);
             let te = this.te_ms; // to shorten next line
-            this.debug8 = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
-            debug_el = this.querySelector("#debug8");
-            if (typeof debug_el !== "undefined") {
-                debug_el.style.display = "block";
-                debug_el.style["font-size"] = "28px";
-                debug_el.style.color = "white";
-                debug_el.style.height = "36px";
-                debug_el.innerHTML = this.debug8;
+            this.debug[12] = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
+
+            let debug_el;
+
+            for (let i=1;i<=12;i++) {
+                debug_el = this.querySelector("#debug"+i);
+                if (typeof debug_el !== "undefined") {
+                    debug_el.style.display = "block";
+                    debug_el.style.width = "80px";
+                    debug_el.innerHTML = this.debug[i]; //this.netto_ms.toFixed(2);
+                }
             }
         }
-    } // end update_debug
+    } // end debug_update()
 
     debug_clear() {
-        let debug_el = this.querySelector("#debug1");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug2");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug3");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug4");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug5");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug6");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug7");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
-        }
-        debug_el = this.querySelector("#debug8");
-        if (typeof debug_el !== "undefined") {
-            debug_el.style.display = "none";
+        let debug_el;
+        for (let i=1;i<=12;i++) {
+            debug_el = this.querySelector("#debug"+i);
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "none";
+            }
         }
     } // end debug_clear
 }
