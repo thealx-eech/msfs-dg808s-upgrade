@@ -11,6 +11,11 @@ gauges_dg808s_panel_2-element #nav_display {
 		background-repeat: no-repeat;
 }
 
+gauges_dg808s_panel_2-element .nav_display_battery_required {
+		position: absolute;
+        display: none;
+}
+
 gauges_dg808s_panel_2-element #nav_display_top_div {
 		left: 11px;
 		top: 20px;

@@ -133,7 +133,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     //********************************************************************
 
     Update() {
+        // Display code version on panel (only on startup)
         this.version_init();
+
         // Collect simvar data used by multiple instruments
         this.global_vars_update();
 
@@ -236,8 +238,11 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // ************************************************************
     global_vars_update() {
         this.slew_mode = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool");
-        // this.pause_mode:
-        this.pause_mode_update();
+        // this.pause_mode
+        this.pause_mode_update(); // Set this.pause_mode:
+        // this.power_switch
+        // this.power_status
+        this.power_update(); // Set this.power_switch;
         this.time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
         //this.airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED INDICATED", "feet per second") / this.M_TO_F;
         this.airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED TRUE", "feet per second") / this.M_TO_F;
@@ -255,6 +260,21 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.pause_mode = !on_ground && (speed2 == this.pause_mode_previous_speed2); // in air and speed EXACTLY fixed
         }
         this.pause_mode_previous_speed2 = speed2;
+    }
+
+    // Set this.power_switched when power CHANGES - note it will go true FOR A SINGLE UPDATE CYCLE
+    // Set this.power_status to true/false if power is ON/OFF
+    power_update() {
+        this.power_switched = false;
+	    const new_power_status = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? true : false;
+        if (typeof this.power_status === "undefined" ) {
+            this.power_switched = true;
+        } else if (new_power_status && !this.power_status) {
+            this.power_switched = true;
+        } else if (!new_power_status && this.power_status) {
+            this.power_switched = true;
+        }
+        this.power_status = new_power_status;
     }
 
     // ************************************************************
@@ -460,29 +480,41 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.variometer_mode_time_s = this.time_s;      // MSFS timestamp when climb/cruise started
         this.variometer_altitude_start_m = 0;    // start height of cruise or climb
 
-        // "88" as flaps display
-        let flap_display = this.querySelector("#variometer_flap_display");
-		if (typeof flap_display !== "undefined") {
-            flap_display.innerHTML = "88";
-        }
+        // Enable all variometer display elements
+        this.querySelector(".variometer_battery_required").style.display = "block";
+
+        // "88" as flaps display, all flap alerts displayed
+        this.variometer_display_flap(-1);
 
         // "-8.8" as average display, plus BOTH increasing and decreasing indicators
-        this.variometer_display_average(-8.8, true, true);
+        this.variometer_display_number(-18.8, true, true);
     }
 
-
     variometer_update() {
-        const POWER_UP_TIME_S = 7; // duration (sec) of full power-up sequence
+        const POWER_UP_TIME_S = 6; // duration (sec) of full power-up sequence
 
-        // On first update all we do is init()
-        if (this.variometer_init_time_s == null) {
-            this.variometer_init();
+        // Note this.power_switched is always true on startup
+        if (this.power_switched) {
+            if (this.power_status) {
+                this.variometer_init();
+            } else {
+                this.querySelector(".variometer_battery_required").style.display = "none";
+                this.variometer_tone_update(0);
+                this.variometer_display_needle(0);
+            }
             return;
         }
 
+        // Do nothing if no power
+        if (!this.power_status) {
+            return;
+        }
+
+        //if (!this.variometer_init_time_s) this.variometer_init();
+
         // If we're inside the 'power up' time, we just animate the gauge
         if (this.time_s - this.variometer_init_time_s < POWER_UP_TIME_S) {
-            const CYCLE_TIME_S = 4;
+            const CYCLE_TIME_S = POWER_UP_TIME_S * 2 / 3;
             const POWER_UP_DELAY_S = POWER_UP_TIME_S - CYCLE_TIME_S;
             // 't' is time within CYCLE_TIME_S
             let t = this.time_s - this.variometer_init_time_s - POWER_UP_DELAY_S;
@@ -506,7 +538,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         // On startup write a zero the the averager display
         if (this.variometer_update_time_s == null) {
-            this.variometer_display_average(0, false, false); // display 0, no increasing/decreasing indicators
+            this.variometer_display_number(0, false, false); // display 0, no increasing/decreasing indicators
             this.variometer_update_time_s = this.time_s; // Initialize update time
         }
 
@@ -586,14 +618,14 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
             this.variometer_previous_average_ms = average_ms; // Store current average for next comparison
 
-            this.variometer_display_average(average_ms, increasing, decreasing);
+            this.variometer_display_number(average_ms * this.MS_TO_KT, increasing, decreasing);
         }
 
     }
 
     // VARIO TONE
     variometer_tone_update(needle_value_ms) {
-		if (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) {
+		if (this.power_status) {
             SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", needle_value_ms * this.MS_TO_FPM);
         } else {
             SimVar.SetSimVarValue("L:VARIO_TONE", "feet per minute", 0);
@@ -649,17 +681,21 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     // Update the variometer average display area with average (float), and increasing/decreasing indicators (booleans)
-    variometer_display_average(display_value_ms, increasing, decreasing) {
+    variometer_display_number(display_value, increasing, decreasing) {
         // Update averager reading
         let averager_digits_el = this.querySelector("#variometer_averager_digits");
         let averager_decimal_el = this.querySelector("#variometer_averager_decimal");
+        let averager_sign_el = this.querySelector("#variometer_averager_sign");
 		if (typeof averager_digits_el !== "undefined" && typeof averager_decimal_el !== "undefined") {
-            let v = Math.round(display_value_ms * this.MS_TO_KT * 10);
+            let v = Math.round(display_value * 10);
+            let sign = v <= -1 ? "-" : "";
+            v = Math.min(Math.abs(v),199); // Limit display to +/-19.9 max
             let digits =  Math.trunc(v/10);
-            let decimal = Math.abs(v % 10);
+            let decimal = v % 10;
             // Note no "-" in front of 0.0 (e.g. from display value -0.04)
-            averager_digits_el.innerHTML = (v<=-1 ? "-" : "")+Math.abs(digits);   // [sign+]integer(s)
-            averager_decimal_el.innerHTML = ""+decimal;    // tenths
+            averager_digits_el.innerHTML = digits;   // [sign+]integer(s)
+            averager_decimal_el.innerHTML = "" + decimal;    // tenths
+            averager_sign_el.innerHTML = sign;
         }
         // Set increasing / decreasing indicators
         let increasing_el = this.querySelector("#variometer_average_increasing");
@@ -673,8 +709,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     variometer_display_flap(flap_index) {
-        // Display of flap setting name (e.g. "T1")
         let flap_display = this.querySelector("#variometer_flap_display");
+        // Startup only - show all icons
+        if (flap_index < 0) {
+    		if (typeof flap_display !== "undefined") {
+                flap_display.innerHTML = "88";
+            }
+            this.variometer_display_flap_alert([[true,true],[true,true]]);
+            return;
+        }
+        // Display of flap setting name (e.g. "T1")
 		if (typeof flap_display !== "undefined") {
             let flap_str = [ "-3","-2","-1","0","T1","T2","L" ][flap_index];
             flap_display.innerHTML = flap_str;
@@ -756,6 +800,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.nav_display_set_wp(); // Set current waypoint info for flightplan index this.nav_display_wp_index
 
         this.nav_display_wp_count = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointsNumber", "number");
+
+        // Enable all variometer display elements
+        this.querySelector(".nav_display_battery_required").style.display = "block";
+
         // Gauge needs to hide previous displayed pointer element
         this.nav_display_previous_pointer_el = this.querySelector("#nav_display_all"); // start with all pointer elements lit
 
@@ -767,17 +815,26 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Update function for nav_display, called on each sim update loop
     nav_display_update() {
 
-        // On startup -just call init()
-        if (this.nav_display_init_time_s == null) {
-            this.nav_display_init();
+        // Note this.power_switched is always true on startup
+        if (this.power_switched) {
+            if (this.power_status) {
+                this.nav_display_init();
+            } else {
+                this.querySelector(".nav_display_battery_required").style.display = "none";
+            }
             return;
         }
 
-        const POWER_UP_TIME_S = 10; // duration (sec) of full power-up sequence
+        // Do nothing if no power
+        if (!this.power_status) {
+            return;
+        }
+
+        const POWER_UP_TIME_S = 6; // duration (sec) of full power-up sequence
 
         // If we're inside the 'power up' time, we just animate the gauge
         if (this.time_s - this.nav_display_init_time_s < POWER_UP_TIME_S) {
-            const CYCLE_TIME_S = 7;
+            const CYCLE_TIME_S = POWER_UP_TIME_S * 3/4;
             const POWER_UP_DELAY_S = POWER_UP_TIME_S - CYCLE_TIME_S;
             // 't' is time within CYCLE_TIME_S
             let t = this.time_s - this.nav_display_init_time_s - POWER_UP_DELAY_S;
@@ -983,6 +1040,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_enabled = false;
         this.debug_glide_ratio = 50;
         this.debug_airspeed_ms = 0;
+        //DEBUG
+        this.debug_power_was_switched = false;
     }
 
 
@@ -1009,6 +1068,11 @@ class gauges_dg808s_panel_2 extends TemplateElement {
                 this.debug_clear();
             }
             return;
+        }
+
+        //DEBUG
+        if (this.power_switched) {
+            this.debug_power_was_switched = true;
         }
 
         /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
@@ -1042,8 +1106,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.debug[12] = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
 
             // Cambridge
-            this.debug[13] = "";
-            this.debug[14] = this.slew_mode ? "SLEW" : "";
+            this.debug[13] = typeof this.power_status; // ? "P.ON" : "POW OFF";
+            this.debug[14] = this.debug_power_was_switched ? "SW" : "NO_SW"; //this.slew_mode ? "SLEW" : "";
             this.debug[15] = this.pause_mode ? "PAUSE" : "";
             this.debug[16] = this.netto_ms.toFixed(2);
 

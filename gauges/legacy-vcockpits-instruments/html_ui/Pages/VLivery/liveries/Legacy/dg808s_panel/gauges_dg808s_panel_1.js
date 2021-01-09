@@ -29,28 +29,48 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //********** MSFS Update() Callback ***************************************
     //*************************************************************************
     Update() {
-        this.update_altimeter();
-        this.update_turn_and_bank();
-        this.update_outside_air_temp();
-        this.update_electrical_buttons();
-        this.update_radio();
-        this.update_transponder();
-        this.update_compass();
-        this.update_trim();
+        // Collect simvar data used by multiple instruments
+        this.global_vars_update();
+
+        this.altimeter_update();
+        this.turn_and_bank_update();
+        this.outside_air_temp_update();
+        this.electrical_buttons_update();
+        this.radio_update();
+        this.transponder_update();
+        this.compass_update();
+        this.trim_update();
     }
 
-    /*playInstrumentSound(soundId) {
-        if (this.isElectricityAvailable()) {
-            Coherent.call("PLAY_INSTRUMENT_SOUND", soundId);
-            return true;
+    // ************************************************************
+    // Update 'global' values from Simvars
+    // ************************************************************
+    global_vars_update() {
+        this.slew_mode = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool");
+        // this.power_switch
+        // this.power_status
+        this.power_update(); // Set this.power_switch;
+    }
+
+    // Set this.power_switched when power CHANGES - note it will go true FOR A SINGLE UPDATE CYCLE
+    // Set this.power_status to true/false if power is ON/OFF
+    power_update() {
+        this.power_switched = false;
+	    const new_power_status = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? true : false;
+        if (typeof this.power_status === "undefined" ) {
+            this.power_switched = true;
+        } else if (new_power_status && !this.power_status) {
+            this.power_switched = true;
+        } else if (!new_power_status && this.power_status) {
+            this.power_switched = true;
         }
-        return false;
-    }	*/
+        this.power_status = new_power_status;
+    }
 
     //***********************************************************************************
     //***********  ALTIMETER  ***********************************************************
     //***********************************************************************************
-    update_altimeter() {
+    altimeter_update() {
 
         let altitude_feet = SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet");
 
@@ -140,7 +160,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********************************************************************************
     //***********  TURN AND BANK   ******************************************************
     //***********************************************************************************
-    update_turn_and_bank() {
+    turn_and_bank_update() {
 		/* TURN_BANK_TURN_BANK_OFF_FLAG_0 */
 		var turn_bank_turn_bank_off_flag_0 = this.querySelector("#turn_bank_turn_bank_off_flag_0");
 		if (typeof turn_bank_turn_bank_off_flag_0 !== "undefined") {
@@ -228,7 +248,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********************************************************************************
     //***********  OUTSIDE AIR TEMP   ***************************************************
     //***********************************************************************************
-    update_outside_air_temp() {
+    outside_air_temp_update() {
 		/* OAT_OAT_STRIP_0 */
 		var oat_oat_strip_0 = this.querySelector("#oat_oat_strip_0");
 		if (typeof oat_oat_strip_0 !== "undefined") {
@@ -270,7 +290,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********************************************************************************
     //***********  ELECTRICAL BUTTONS   *************************************************
     //***********************************************************************************
-    update_electrical_buttons() {
+    electrical_buttons_update() {
 
 		/* ELECTRICAL_BUTTONS_VARIO_0 */
 		var electrical_buttons_VARIO_0 = this.querySelector("#electrical_buttons_VARIO_0");
@@ -306,273 +326,56 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********************************************************************************
     //***********  RADIO    *************************************************************
     //***********************************************************************************
-    update_radio() {
-		/* RADIO_RADIO_KNOB_POWER_AND_VOLUME_0 */
-		var radio_radio_knob_power_and_volume_0 = this.querySelector("#radio_radio_knob_power_and_volume_0");
-		if (typeof radio_radio_knob_power_and_volume_0 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    radio_radio_knob_power_and_volume_0.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_STANDBY_OUT_1 */
-		var radio_radio_button_standby_out_1 = this.querySelector("#radio_radio_button_standby_out_1");
-		if (typeof radio_radio_button_standby_out_1 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    radio_radio_button_standby_out_1.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_STANDBY_IN_2 */
-		var radio_radio_button_standby_in_2 = this.querySelector("#radio_radio_button_standby_in_2");
-		if (typeof radio_radio_button_standby_in_2 !== "undefined") {
-		  var transform = '';
-
-		  radio_radio_button_standby_in_2.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    radio_radio_button_standby_in_2.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_MODE_OUT_3 */
-		var radio_radio_button_mode_out_3 = this.querySelector("#radio_radio_button_mode_out_3");
-		if (typeof radio_radio_button_mode_out_3 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    radio_radio_button_mode_out_3.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_MODE_IN_4 */
-		var radio_radio_button_mode_in_4 = this.querySelector("#radio_radio_button_mode_in_4");
-		if (typeof radio_radio_button_mode_in_4 !== "undefined") {
-		  var transform = '';
-
-		  radio_radio_button_mode_in_4.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    radio_radio_button_mode_in_4.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_SQUELCH_OUT_5 */
-		var radio_radio_button_squelch_out_5 = this.querySelector("#radio_radio_button_squelch_out_5");
-		if (typeof radio_radio_button_squelch_out_5 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    radio_radio_button_squelch_out_5.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_SQUELCH_IN_6 */
-		var radio_radio_button_squelch_in_6 = this.querySelector("#radio_radio_button_squelch_in_6");
-		if (typeof radio_radio_button_squelch_in_6 !== "undefined") {
-		  var transform = '';
-
-		  radio_radio_button_squelch_in_6.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    radio_radio_button_squelch_in_6.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_STO_OUT_7 */
-		var radio_radio_button_sto_out_7 = this.querySelector("#radio_radio_button_sto_out_7");
-		if (typeof radio_radio_button_sto_out_7 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    radio_radio_button_sto_out_7.style.transform = transform;
-
-		}
-
-		/* RADIO_RADIO_BUTTON_STO_IN_8 */
-		var radio_radio_button_sto_in_8 = this.querySelector("#radio_radio_button_sto_in_8");
-		if (typeof radio_radio_button_sto_in_8 !== "undefined") {
-		  var transform = '';
-
-		  radio_radio_button_sto_in_8.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    radio_radio_button_sto_in_8.style.transform = transform;
-
-		}
-
+    radio_update() {
 		/* RADIO_TRANSMISSION_INDICATION_9 */
 		var radio_Transmission_Indication_9 = this.querySelector("#radio_Transmission_Indication_9");
 		if (typeof radio_Transmission_Indication_9 !== "undefined") {
-		  var transform = '';
-
-		  radio_Transmission_Indication_9.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL COMM:1", "boolean"))) * !((SimVar.GetSimVarValue("COM TRANSMIT:1", "boolean"))) ? "block" : "none";
-
-			radio_Transmission_Indication_9.innerHTML = "<";
-
-		  if (transform != '')
-		    radio_Transmission_Indication_9.style.transform = transform;
-
+		  radio_Transmission_Indication_9.style.display = (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL COMM:1", "boolean"))) * !((SimVar.GetSimVarValue("COM TRANSMIT:1", "boolean"))) ? "block" : "none";
+  		  radio_Transmission_Indication_9.innerHTML = "<";
 		}
 
 		/* RADIO_ACTIVE_FREQUENCY_10 */
 		var radio_Active_Frequency_10 = this.querySelector("#radio_Active_Frequency_10");
 		if (typeof radio_Active_Frequency_10 !== "undefined") {
-		  var transform = '';
-
-		  radio_Active_Frequency_10.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL COMM:1", "boolean"))) ? "block" : "none";
-
-			radio_Active_Frequency_10.innerHTML = ( (SimVar.GetSimVarValue("COM ACTIVE FREQUENCY:1", "MHz")) ).toFixed(2).toString() ;
-
-		  if (transform != '')
-		    radio_Active_Frequency_10.style.transform = transform;
-
+		     radio_Active_Frequency_10.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL COMM:1", "boolean"))) ? "block" : "none";
+	         radio_Active_Frequency_10.innerHTML = SimVar.GetSimVarValue("COM ACTIVE FREQUENCY:1", "MHz").toFixed(2) ;
 		}
 
 		/* RADIO_STANDBY_FREQUENCY_11 */
 		var radio_Standby_Frequency_11 = this.querySelector("#radio_Standby_Frequency_11");
 		if (typeof radio_Standby_Frequency_11 !== "undefined") {
-		  var transform = '';
-
 		  radio_Standby_Frequency_11.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL COMM:1", "boolean"))) ? "block" : "none";
 
-			radio_Standby_Frequency_11.innerHTML = ( (SimVar.GetSimVarValue("COM STANDBY FREQUENCY:1", "MHz")) ).toFixed(2).toString() ;
-
-		  if (transform != '')
-		    radio_Standby_Frequency_11.style.transform = transform;
-
+			radio_Standby_Frequency_11.innerHTML = SimVar.GetSimVarValue("COM STANDBY FREQUENCY:1", "MHz").toFixed(2) ;
 		}
     }
 
     //***********************************************************************************
     //***********  TRANSPONDER  *********************************************************
     //***********************************************************************************
-    update_transponder() {
-		/* TRANSPONDER_TRANSPONDER_BUTTON_STANDBY_OUT_0 */
-		var transponder_transponder_button_standby_out_0 = this.querySelector("#transponder_transponder_button_standby_out_0");
-		if (typeof transponder_transponder_button_standby_out_0 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    transponder_transponder_button_standby_out_0.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_STANDBY_IN_1 */
-		var transponder_transponder_button_standby_in_1 = this.querySelector("#transponder_transponder_button_standby_in_1");
-		if (typeof transponder_transponder_button_standby_in_1 !== "undefined") {
-		  var transform = '';
-
-		  transponder_transponder_button_standby_in_1.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    transponder_transponder_button_standby_in_1.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_MODE_OUT_2 */
-		var transponder_transponder_button_mode_out_2 = this.querySelector("#transponder_transponder_button_mode_out_2");
-		if (typeof transponder_transponder_button_mode_out_2 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    transponder_transponder_button_mode_out_2.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_MODE_IN_3 */
-		var transponder_transponder_button_mode_in_3 = this.querySelector("#transponder_transponder_button_mode_in_3");
-		if (typeof transponder_transponder_button_mode_in_3 !== "undefined") {
-		  var transform = '';
-
-		  transponder_transponder_button_mode_in_3.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    transponder_transponder_button_mode_in_3.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_SQUELCH_OUT_4 */
-		var transponder_transponder_button_squelch_out_4 = this.querySelector("#transponder_transponder_button_squelch_out_4");
-		if (typeof transponder_transponder_button_squelch_out_4 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    transponder_transponder_button_squelch_out_4.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_SQUELCH_IN_5 */
-		var transponder_transponder_button_squelch_in_5 = this.querySelector("#transponder_transponder_button_squelch_in_5");
-		if (typeof transponder_transponder_button_squelch_in_5 !== "undefined") {
-		  var transform = '';
-
-		  transponder_transponder_button_squelch_in_5.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    transponder_transponder_button_squelch_in_5.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_STO_OUT_6 */
-		var transponder_transponder_button_sto_out_6 = this.querySelector("#transponder_transponder_button_sto_out_6");
-		if (typeof transponder_transponder_button_sto_out_6 !== "undefined") {
-		  var transform = '';
-
-		  if (transform != '')
-		    transponder_transponder_button_sto_out_6.style.transform = transform;
-
-		}
-
-		/* TRANSPONDER_TRANSPONDER_BUTTON_STO_IN_7 */
-		var transponder_transponder_button_sto_in_7 = this.querySelector("#transponder_transponder_button_sto_in_7");
-		if (typeof transponder_transponder_button_sto_in_7 !== "undefined") {
-		  var transform = '';
-
-		  transponder_transponder_button_sto_in_7.style.display = 0 ? "block" : "none";
-
-		  if (transform != '')
-		    transponder_transponder_button_sto_in_7.style.transform = transform;
-
-		}
+    transponder_update() {
 
 		/* TRANSPONDER_TRANSPONDER_CODE_8 */
 		var transponder_Transponder_Code_8 = this.querySelector("#transponder_Transponder_Code_8");
 		if (typeof transponder_Transponder_Code_8 !== "undefined") {
-		  var transform = '';
-
 		  transponder_Transponder_Code_8.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL TRANSPONDER:1", "boolean"))) ? "block" : "none";
 
-			transponder_Transponder_Code_8.innerHTML = ( 0 ).toString() + "(l0 12 >> 15 &)%!d!" + Math.round( 0 ).toString() + "(l0 4 >> 15 &)%!d!" + Math.round( 0 ).toString() ;
-
-		  if (transform != '')
-		    transponder_Transponder_Code_8.style.transform = transform;
-
+			transponder_Transponder_Code_8.innerHTML = 7000; // Maybe decode SimVar.GetSimVarValue("TRANSPONDER CODE:1", "number"); ?? FORMAT ??
 		}
 
 		/* TRANSPONDER_MODE_C_ALTITUDE_DISPLAY_9 */
 		var transponder_Mode_C_Altitude_Display_9 = this.querySelector("#transponder_Mode_C_Altitude_Display_9");
 		if (typeof transponder_Mode_C_Altitude_Display_9 !== "undefined") {
-		  var transform = '';
-
 		  transponder_Mode_C_Altitude_Display_9.style.display = 1 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean")) * !((SimVar.GetSimVarValue("PARTIAL PANEL TRANSPONDER", "boolean"))) ? "block" : "none";
 
-			transponder_Mode_C_Altitude_Display_9.innerHTML = "F" + Math.round( Math.round(( ( 1 == 2 ) ?  3.048 :  10 ) * ((SimVar.GetSimVarValue("PLANE ALTITUDE", "feet")) / 1000 - (SimVar.GetSimVarValue("SEA LEVEL PRESSURE", "inhg")) + 29.92)) ).toString() ;
-
-		  if (transform != '')
-		    transponder_Mode_C_Altitude_Display_9.style.transform = transform;
-
+			transponder_Mode_C_Altitude_Display_9.innerHTML = "F" + Math.round(SimVar.GetSimVarValue("PLANE ALTITUDE","feet") / 100);
 		}
     }
 
     //***********************************************************************************
     //***********  COMPASS      *********************************************************
     //***********************************************************************************
-    update_compass() {
+    compass_update() {
 
 		/* COMPASS_COMPASS_STRIP_0 */
 		var compass_compass_strip_0 = this.querySelector("#compass_compass_strip_0");
@@ -625,7 +428,28 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     //***********************************************************************************
     //***********  trim      *********************************************************
     //***********************************************************************************
-    update_trim() {
+
+    trim_init() {
+        // Enable all variometer display elements
+        this.querySelector(".trim_battery_required").style.display = "block";
+    }
+
+    trim_update() {
+        // Note this.power_switched is always true on startup
+        if (this.power_switched) {
+            if (this.power_status) {
+                this.trim_init();
+            } else {
+                this.querySelector(".trim_battery_required").style.display = "none";
+            }
+            return;
+        }
+
+        // Do nothing if no power
+        if (!this.power_status) {
+            return;
+        }
+
         let trim_gear_down_el = this.querySelector("#trim_gear_down");
 		if (typeof trim_gear_down_el !== "undefined") {
             let gear_position = SimVar.GetSimVarValue("A:GEAR HANDLE POSITION", "bool"); // true = GEAR DOWN

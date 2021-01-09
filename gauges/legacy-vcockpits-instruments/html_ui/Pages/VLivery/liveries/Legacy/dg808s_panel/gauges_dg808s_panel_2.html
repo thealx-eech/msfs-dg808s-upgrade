@@ -2,8 +2,8 @@
 <link rel="stylesheet" href="gauges_dg808s_panel_2.css?bi" />
 <link rel="stylesheet" href="asi/asi.css?ba" />
 <link rel="stylesheet" href="winter/winter.css?az" />
-<link rel="stylesheet" href="variometer/variometer.css?cu" />
-<link rel="stylesheet" href="nav_display/nav_display.css?bv" />
+<link rel="stylesheet" href="variometer/variometer.css?de" />
+<link rel="stylesheet" href="nav_display/nav_display.css?bw" />
 
 <script type="text/html" id="gauges_dg808s_panel_2">
     <div id="Mainframe">
@@ -11,9 +11,12 @@
 			<div id="asi_needle"></div>
 		</div>
 		<div id="variometer">
-			<div class="battery_required">
+			<div class="variometer_battery_required">
+				<div id="variometer_averager_avg"></div>
 				<div id="variometer_averager_digits"></div>
 				<div id="variometer_averager_decimal"></div>
+				<div id="variometer_averager_decimal_point"></div>
+                <div id="variometer_averager_sign"></div>
 				<div id="variometer_average_increasing"></div>
 				<div id="variometer_average_decreasing"></div>
 				<div id="variometer_flap_display"></div>
@@ -21,9 +24,9 @@
 				<div id="variometer_flap_up_2"></div>
 				<div id="variometer_flap_down_1"></div>
 				<div id="variometer_flap_down_2"></div>
-				<div id="variometer_mode_auto_climb"></div>
 				<div id="variometer_mode_climb"></div>
 				<div id="variometer_mode_cruise"></div>
+				<div id="variometer_mode_auto_climb"></div>
 			</div>
 			<div id="variometer_needle">
 			</div>
@@ -33,19 +36,21 @@
 			</div>
 		</div>
 		<div id="nav_display">
-            <div id="nav_display_top_div"><div id="nav_display_top"></div></div>
-            <div id="nav_display_4L"></div>
-            <div id="nav_display_3L"></div>
-            <div id="nav_display_2L"></div>
-            <div id="nav_display_1L"></div>
-            <div id="nav_display_zero"></div>
-            <div id="nav_display_1R"></div>
-            <div id="nav_display_2R"></div>
-            <div id="nav_display_3R"></div>
-            <div id="nav_display_4R"></div>
-            <div id="nav_display_all"></div>
-            <div id="nav_display_middle"></div>
-            <div id="nav_display_bottom"></div>
+            <div class="nav_display_battery_required">
+                <div id="nav_display_top_div"><div id="nav_display_top"></div></div>
+                <div id="nav_display_4L"></div>
+                <div id="nav_display_3L"></div>
+                <div id="nav_display_2L"></div>
+                <div id="nav_display_1L"></div>
+                <div id="nav_display_zero"></div>
+                <div id="nav_display_1R"></div>
+                <div id="nav_display_2R"></div>
+                <div id="nav_display_3R"></div>
+                <div id="nav_display_4R"></div>
+                <div id="nav_display_all"></div>
+                <div id="nav_display_middle"></div>
+                <div id="nav_display_bottom"></div>
+            </div>
 		</div>
         <!-- DEBUG on ASI -->
         <div id="debug1" style="top: 13px; left: 0px;" class="b21_debug"></div>
@@ -53,7 +58,7 @@
         <div id="debug3" style="top: 53px; left: 20px;" class="b21_debug"></div>
         <div id="debug4" style="top: 88px; left: 15px;" class="b21_debug"></div>
         <!-- DEBUG on NAV -->
-        <div id="debug_version" style="display: block; top: 7px; left: 105px; font-size: 14px;" class="b21_debug">v.42</div>
+        <div id="debug_version" style="display: block; top: 7px; left: 105px; font-size: 14px;" class="b21_debug"></div>
         <div id="debug5" style="top: 23px; left: 112px;" class="b21_debug"></div>
         <div id="debug6" style="top: 23px; left: 142px;" class="b21_debug"></div>
         <div id="debug7" style="top: 80px; left: 87px;" class="b21_debug"></div>
@@ -73,4 +78,4 @@
     </div>
 </script>
 
-<script type="text/html" import-script="/Pages/VLivery/Liveries/legacy/dg808s_panel/gauges_dg808s_panel_2.js?vc"></script>
+<script type="text/html" import-script="/Pages/VLivery/Liveries/legacy/dg808s_panel/gauges_dg808s_panel_2.js?wv"></script>

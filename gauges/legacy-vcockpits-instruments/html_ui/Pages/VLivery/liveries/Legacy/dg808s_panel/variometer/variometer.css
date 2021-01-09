@@ -12,8 +12,9 @@ gauges_dg808s_panel_2-element #variometer {
 		height: 90px;
 }
 
-gauges_dg808s_panel_2-element .battery_required {
+gauges_dg808s_panel_2-element .variometer_battery_required {
 		position: absolute;
+        display: none;
 }
 
 gauges_dg808s_panel_2-element #variometer_averager_digits {
@@ -25,9 +26,9 @@ gauges_dg808s_panel_2-element #variometer_averager_digits {
 		color: #000000;
 		font-size: 22px;
 
-		width: 25px;
+		width: 45px;
 		height: 22px;
-		left: 20px;
+		left: 0px;
 		top: 54px;
 	}
 
@@ -44,6 +45,49 @@ gauges_dg808s_panel_2-element #variometer_averager_decimal {
 		height: 22px;
 		left: 35px;
 		top: 54px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_averager_sign {
+		background: transparent;
+		position: absolute;
+		overflow: hidden;
+		text-align: right;
+		font-family: "Quartz";
+		color: #000000;
+		font-size: 22px;
+
+		width: 25px;
+		height: 22px;
+		left: 3px;
+		top: 54px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_averager_avg {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/avg.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        /*display: none;*/
+		width: 18px;
+		height: 11px;
+		left: 17px;
+		top: 46px;
+	}
+
+gauges_dg808s_panel_2-element #variometer_averager_decimal_point {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/variometer/decimal_point.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+        /*display: none;*/
+		width: 4px;
+		height: 4px;
+		left: 47px;
+		top: 72px;
 	}
 
 gauges_dg808s_panel_2-element #variometer_average_increasing {

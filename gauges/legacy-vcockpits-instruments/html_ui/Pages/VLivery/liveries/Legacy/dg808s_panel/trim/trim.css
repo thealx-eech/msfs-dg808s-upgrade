@@ -13,6 +13,11 @@ gauges_dg808s_panel_1-element #trim {
 		height: 20px;
 }
 
+gauges_dg808s_panel_2-element .trim_battery_required {
+		position: absolute;
+        display: none;
+}
+
 gauges_dg808s_panel_1-element #trim_gear_down {
 		background: transparent;
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/gear_down.png");
