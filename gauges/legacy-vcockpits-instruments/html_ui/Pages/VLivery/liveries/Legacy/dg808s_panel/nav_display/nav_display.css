@@ -1,14 +1,14 @@
 
 gauges_dg808s_panel_2-element #nav_display {
-		position: absolute;
-		overflow: hidden;
 		left: 130px;
 		top: 5px;
-		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/nav_display_nav_display_background.png");
-		background-position: 0px 0px;
-		background-repeat: no-repeat;
 		width: 121px;
 		height: 122px;
+		position: absolute;
+		overflow: hidden;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/nav_display/background.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
 }
 
 gauges_dg808s_panel_2-element #nav_display_top_div {
