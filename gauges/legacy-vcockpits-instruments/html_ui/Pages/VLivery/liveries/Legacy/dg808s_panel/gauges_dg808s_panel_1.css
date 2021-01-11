@@ -808,3 +808,18 @@ gauges_dg808s_panel_1-element #Mainframe #compass_compass_lubber_line_3 {
 		top: calc(19.000px - 0px);
 		transform-origin: 0px 0px;
 	}
+
+.b21_debug {
+    display: none; /* will be enabled in JS as needed */
+   /* background: transparent; */
+    position: absolute;
+    /* overflow: hidden; */
+    font-size: 20px;
+    font-family: "Font-Bold";
+    color: white;
+    height: 24px;
+    margin-bottom: 2px;
+    width: 100px;
+    text-align: right;
+    vertical-align: center;
+}

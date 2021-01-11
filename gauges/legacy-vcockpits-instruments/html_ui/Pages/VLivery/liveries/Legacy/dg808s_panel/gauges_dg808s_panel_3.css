@@ -73,33 +73,6 @@ gauges_dg808s_panel_3-element #Mainframe #yawString0 {
 	left: 3px;
 }
 
-/*gauges_dg808s_panel_3-element #Mainframe #windMark {
-	position: relative;
-	background: blue;
-	width: 5px;
-	height: 5px;
-}
-gauges_dg808s_panel_3-element #Mainframe #velocityMark {
-	position: relative;
-	background: red;
-	width: 5px;
-	height: 5px;
-}
-gauges_dg808s_panel_3-element #Mainframe #testStart {
-	position: absolute;
-	background: black;
-	width: 3px;
-	height: 3px;
-}*/
-gauges_dg808s_panel_3-element #Mainframe #centralDot {
-	position: absolute;
-	background: black;
-	width: 3px;
-	height: 3px;
-	border-radius: 50%;
-	top: 90px;
-}
-
 gauges_dg808s_panel_3-element #Mainframe .yawStringEl {
 		position: absolute;
 /*		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/asi_asi_background.png");*/
@@ -125,4 +98,20 @@ gauges_dg808s_panel_3-element #Mainframe #yawString2, gauges_dg808s_panel_3-elem
 gauges_dg808s_panel_3-element #Mainframe #yawString3, gauges_dg808s_panel_3-element #Mainframe #yawString6, gauges_dg808s_panel_3-element #Mainframe #yawString9
 {
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/yawstring/yawstring-section3.png");
+}
+
+.b21_debug {
+    transform: scale(-1,-1); /* only for canopy */
+    display: none; /* will be enabled in JS as needed */
+   /* background: transparent; */
+    position: absolute;
+    /* overflow: hidden; */
+    font-size: 30px;
+    font-family: "Font-Bold";
+    color: #000044;
+    height: 24px;
+    margin-bottom: 2px;
+    width: 100px;
+    text-align: right;
+    vertical-align: center;
 }

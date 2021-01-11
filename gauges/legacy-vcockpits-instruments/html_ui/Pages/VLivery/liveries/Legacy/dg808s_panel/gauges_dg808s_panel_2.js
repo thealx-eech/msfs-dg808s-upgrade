@@ -21,7 +21,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     constructor() {
         super();
-        this.VERSION = "v.44";
+        this.VERSION = "v.45";
         // Constants
         this.MS_TO_KT = 1.94384; // speed conversion consts
         this.MS_TO_KPH = 3.6;    // meter per second to kilometer per hour
@@ -286,7 +286,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.te_previous_time_s = this.time_s;
         this.te_previous_airspeed_ms = this.airspeed_ms;
         this.te_raw_ms = 0;
-        this.te_ms = 0;
+        this.te_ms = 1.23;//0;
         this.te_previous_slew_mode = false;
         //DEBUG
         this.te_compensation_ms = 0;
@@ -1108,7 +1108,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.debug[8] = "";
 
             // Winter
-            this.debug[9] = this.nav_display_flightplan_active ? "FP:ON" : "FP:OFF";
+            this.debug[9] = this.pause_mode ? "PAUSE" : "GO";
             this.debug[10] = this.nav_display_wp_index;
             this.debug[11] = this.nav_display_flightplan.length;//"";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK", "radians") * this.RAD_TO_DEG).toFixed(0);
             let te = this.te_ms; // to shorten next line
@@ -1117,7 +1117,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // Cambridge
             this.debug[13] = ""; //typeof this.power_status; // ? "P.ON" : "POW OFF";
             this.debug[14] = "";
-            this.debug[15] = this.pause_mode ? "PAUSE" : "";
+            this.debug[15] = this.slew_mode ? "SLEW" : "";
             this.debug[16] = this.netto_ms.toFixed(2);
 
             let debug_el;

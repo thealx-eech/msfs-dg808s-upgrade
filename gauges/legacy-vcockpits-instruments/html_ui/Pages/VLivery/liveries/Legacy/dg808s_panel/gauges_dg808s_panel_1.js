@@ -40,31 +40,35 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         this.transponder_update();
         this.compass_update();
         this.trim_update();
+
+        // Debug
+        this.debug_update();
     }
 
     // ************************************************************
     // Update 'global' values from Simvars
     // ************************************************************
     global_vars_update() {
-        this.slew_mode = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool");
-        // this.power_switch
-        // this.power_status
-        this.power_update(); // Set this.power_switch;
+        this.SLEW_MODE = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool");
+        // this.POWER_SWITCHED
+        // this.POWER_STATUS
+        this.power_update();
+        this.TIME_S = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
     }
 
-    // Set this.power_switched when power CHANGES - note it will go true FOR A SINGLE UPDATE CYCLE
-    // Set this.power_status to true/false if power is ON/OFF
+    // Set this.POWER_SWITCHED when power CHANGES - note it will go true FOR A SINGLE UPDATE CYCLE
+    // Set this.POWER_STATUS to true/false if power is ON/OFF
     power_update() {
-        this.power_switched = false;
+        this.POWER_SWITCHED = false;
 	    const new_power_status = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? true : false;
-        if (typeof this.power_status === "undefined" ) {
-            this.power_switched = true;
-        } else if (new_power_status && !this.power_status) {
-            this.power_switched = true;
-        } else if (!new_power_status && this.power_status) {
-            this.power_switched = true;
+        if (typeof this.POWER_STATUS === "undefined" ) {
+            this.POWER_SWITCHED = true;
+        } else if (new_power_status && !this.POWER_STATUS) {
+            this.POWER_SWITCHED = true;
+        } else if (!new_power_status && this.POWER_STATUS) {
+            this.POWER_SWITCHED = true;
         }
-        this.power_status = new_power_status;
+        this.POWER_STATUS = new_power_status;
     }
 
     //***********************************************************************************
@@ -164,23 +168,14 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 		/* TURN_BANK_TURN_BANK_OFF_FLAG_0 */
 		var turn_bank_turn_bank_off_flag_0 = this.querySelector("#turn_bank_turn_bank_off_flag_0");
 		if (typeof turn_bank_turn_bank_off_flag_0 !== "undefined") {
-		  var transform = '';
-
 		  turn_bank_turn_bank_off_flag_0.style.display = !(!(1) * (SimVar.GetSimVarValue("TURN INDICATOR SWITCH", "boolean"))) ? "block" : "none";
-
-		  if (transform != '')
-		    turn_bank_turn_bank_off_flag_0.style.transform = transform;
-
 		}
 
 		/* TURN_BANK_TURN_BANK_BALL_OVERLAY_1 */
 		var turn_bank_turn_bank_ball_overlay_1 = this.querySelector("#turn_bank_turn_bank_ball_overlay_1");
 		if (typeof turn_bank_turn_bank_ball_overlay_1 !== "undefined") {
-		  var transform = '';
-
-		  {
-             /* PARSED FROM "(A:TURN COORDINATOR BALL,percent)" */
-			var ExpressionResult = Math.min(30, Math.max(-30 , -(SimVar.GetSimVarValue("PLANE BANK DEGREES", "degree")))) / 30 * 100;
+			//var ExpressionResult = Math.min(30, Math.max(-30 , -(SimVar.GetSimVarValue("PLANE BANK DEGREES", "degree")))) / 30 * 100;
+            var ExpressionResult = SimVar.GetSimVarValue("A:TURN COORDINATOR BALL","number") * 100;
 			var Minimum = 0;
 			var Maximum = 999999999;
 			var NonlinearityTable = [
@@ -189,39 +184,32 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 				[100,57.000,32.000],
 			];
 
-			if (NonlinearityTable.length > 0) {
-			    Minimum = NonlinearityTable[0][0];
-			    ExpressionResult = Math.max(ExpressionResult, Minimum);
-			    Maximum = NonlinearityTable[NonlinearityTable.length-1][0];
-			    ExpressionResult = Math.min(ExpressionResult, Maximum);
-				var prevP2 = { x: 0, y: 0 };
-				var result = { x: 0, y: 0 };
-				var prevVal = Minimum;
-				for (var i = 0; i < NonlinearityTable.length; i++) {
-					var NonlinearityEntry = NonlinearityTable[i][0];
-					var p2 = { x: NonlinearityTable[i][1], y: NonlinearityTable[i][2] };
-					if (ExpressionResult == NonlinearityEntry) {
-						result = p2;
-						break;
-					}
-					else if (ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry ) {
-						var coef = 1 - (NonlinearityEntry - ExpressionResult) / (NonlinearityEntry - prevVal);
-
-						result = { y: prevP2.y + coef * (p2.y - prevP2.y), x: prevP2.x + coef * (p2.x - prevP2.x) };
-						break;
-					}
-					prevVal = NonlinearityEntry;
-					prevP2 = p2;
+		    Minimum = NonlinearityTable[0][0];
+		    ExpressionResult = Math.max(ExpressionResult, Minimum);
+		    Maximum = NonlinearityTable[NonlinearityTable.length-1][0];
+		    ExpressionResult = Math.min(ExpressionResult, Maximum);
+			var prevP2 = { x: 0, y: 0 };
+			var result = { x: 0, y: 0 };
+			var prevVal = Minimum;
+			for (var i = 0; i < NonlinearityTable.length; i++) {
+				var NonlinearityEntry = NonlinearityTable[i][0];
+				var p2 = { x: NonlinearityTable[i][1], y: NonlinearityTable[i][2] };
+				if (ExpressionResult == NonlinearityEntry) {
+					result = p2;
+					break;
 				}
+				else if (ExpressionResult > prevVal && ExpressionResult < NonlinearityEntry ) {
+					var coef = 1 - (NonlinearityEntry - ExpressionResult) / (NonlinearityEntry - prevVal);
 
-				turn_bank_turn_bank_ball_overlay_1.style.left = result.x + 'px';
-				turn_bank_turn_bank_ball_overlay_1.style.top = result.y +'px';
+					result = { y: prevP2.y + coef * (p2.y - prevP2.y), x: prevP2.x + coef * (p2.x - prevP2.x) };
+					break;
+				}
+				prevVal = NonlinearityEntry;
+				prevP2 = p2;
 			}
 
-		  }
-		  if (transform != '')
-		    turn_bank_turn_bank_ball_overlay_1.style.transform = transform;
-
+			turn_bank_turn_bank_ball_overlay_1.style.left = result.x + 'px';
+			turn_bank_turn_bank_ball_overlay_1.style.top = result.y +'px';
 		}
 
 		/* TURN_BANK_TURN_BANK_NEEDLE_2 */
@@ -231,7 +219,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
 
 		  {
             /* PARSED FROM " (A:Delta Heading Rate, rpm) 0.44 * (A:ELECTRICAL MASTER BATTERY,bool) *" */
-			var ExpressionResult = (-SimVar.GetSimVarValue("TURN INDICATOR RATE", "degree per second")) * 60 / 360 * 0.44 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean"));
+			var ExpressionResult = (SimVar.GetSimVarValue("TURN INDICATOR RATE", "degree per second")) * 60 / 360 * 0.3 * (SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean"));
 			var Minimum = -0.400;
 			ExpressionResult = Math.max(ExpressionResult, Minimum);
 			var Maximum = 0.400;
@@ -435,9 +423,9 @@ class gauges_dg808s_panel_1 extends TemplateElement {
     }
 
     trim_update() {
-        // Note this.power_switched is always true on startup
-        if (this.power_switched) {
-            if (this.power_status) {
+        // Note this.POWER_SWITCHED is always true on startup
+        if (this.POWER_SWITCHED) {
+            if (this.POWER_STATUS) {
                 this.trim_init();
             } else {
                 this.querySelector(".trim_battery_required").style.display = "none";
@@ -446,7 +434,7 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         }
 
         // Do nothing if no power
-        if (!this.power_status) {
+        if (!this.POWER_STATUS) {
             return;
         }
 
@@ -462,6 +450,71 @@ class gauges_dg808s_panel_1 extends TemplateElement {
             pointer_el.style.transform = 'translate('+trim_amount+'px)';
 		}
     }
+
+    // ************************************************************************************************************************
+    // ********** DEBUG              ******************************************************************************************
+    // ************************************************************************************************************************
+
+    debug_init() {
+        // Debug refresh timer and smoothed flight parameters
+        this.debug_var = ["A:LIGHT CABIN","bool"]; // the variable we use to enable/disable debug
+        this.debug_count = 4; // number of debug elements
+        this.debug = new Array(this.debug_count); // variables set in gauges to be displayed in debug areas on panel
+        this.debug_update_time_s = this.TIME_S;
+        this.debug_enabled = false;
+    }
+
+
+    debug_update() {
+        if (this.debug_update_time_s == null) {
+            this.debug_init();
+            return;
+        }
+
+        // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
+        let debug_enable = SimVar.GetSimVarValue(this.debug_var[0], this.debug_var[1]) ? true : false;
+
+        if (debug_enable) {
+            this.debug_enabled = true;
+        } else {
+            if (this.debug_enabled) {
+                this.debug_enabled = false;
+                this.debug_clear();
+            }
+            return;
+        }
+
+        /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
+        if (this.TIME_S - this.debug_update_time_s > 2) {
+            this.debug_update_time_s = this.TIME_S;
+
+            this.debug[1] = "W";
+            this.debug[2] = "X";
+            this.debug[3] = "Y";
+            this.debug[4] = SimVar.GetSimVarValue("TURN COORDINATOR BALL","number").toFixed(5);
+
+            let debug_el;
+
+            for (let i=1;i<=this.debug_count;i++) {
+                debug_el = this.querySelector("#debug"+i);
+                if (typeof debug_el !== "undefined") {
+                    debug_el.style.display = "block";
+                    debug_el.style.width = "80px";
+                    debug_el.innerHTML = this.debug[i];
+                }
+            }
+        }
+    } // end debug_update()
+
+    debug_clear() {
+        let debug_el;
+        for (let i=1;i<=this.debug_count;i++) {
+            debug_el = this.querySelector("#debug"+i);
+            if (typeof debug_el !== "undefined") {
+                debug_el.style.display = "none";
+            }
+        }
+    } // end debug_clear
 
 }
 
