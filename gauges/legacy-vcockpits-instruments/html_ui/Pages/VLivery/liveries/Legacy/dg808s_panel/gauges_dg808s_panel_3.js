@@ -45,16 +45,16 @@ class gauges_dg808s_panel_3 extends TemplateElement {
 
 			var windDirection = (SimVar.GetSimVarValue("AMBIENT WIND DIRECTION", "degree") - planeDirection) * Math.PI/180;
 			var windVelocity = SimVar.GetSimVarValue("AMBIENT WIND VELOCITY", "knots");
-			
+
 			var finalX = motiondirection[0] * (1.1 - Math.pow(motionMagnitude / 200, 0.5)) + windVelocity * Math.sin(windDirection);
 			var finalZ = motiondirection[1] * (1.1 - Math.pow(motionMagnitude / 200, 0.5)) + windVelocity * Math.cos(windDirection) - 1;
 
 			var finalMagnitude = Math.pow(Math.pow(finalX, 2) + Math.pow(finalZ, 2), 0.5);
 			var finalAngle = Math.atan2(finalZ, finalX) * 180 / Math.PI - 90;
-			
+
 			velocityMark.style.transform = 'translate(' + motiondirection[0].toString() + 'px, ' + motiondirection[1].toString() + 'px)';
 			windMark.style.transform = 'translate('+(windVelocity * Math.sin(windDirection))+'px, '+(windVelocity * Math.cos(windDirection))+'px)';
-			
+
 			var stringElements = this.querySelectorAll(".yawStringEl");
 			var i = 1.0;
 			var totalAngle = 0.0;
@@ -67,14 +67,14 @@ class gauges_dg808s_panel_3 extends TemplateElement {
 					currAngle = 0;
 				else
 				  currAngle = currAngle.replace('rotate(','').replace('deg)','');
-			
+
 				currAngle = parseFloat(currAngle);
-				
+
 				if (currAngle > 360.0)
 					currAngle -= 360.0;
 				if (currAngle < -360.0)
 					currAngle += 360.0;
-				
+
 				var angleLimit = (11.0 - i) * 2.0;
 				var newAngle = currAngle;
 				if (totalAngle + currAngle > finalAngle) {
@@ -83,30 +83,30 @@ class gauges_dg808s_panel_3 extends TemplateElement {
 				else if (totalAngle + currAngle <= finalAngle) {
 					newAngle += (finalAngle - (totalAngle + currAngle)) * reaction;
 				}
-					
+
 				newAngle = Math.min(newAngle, angleLimit);
 				newAngle = Math.max(newAngle, - angleLimit);
 				console.log(i + " curr" + currAngle + " new" + newAngle);
-					
+
 				stringElement.style.transform  = 'rotate(' + newAngle + 'deg)';
-				
+
 				totalAngle += newAngle;
-				
+
 				i++;
 			});
-			
+
 			//var PointsTo = 0;
 			//yawString.style.transform  += 'rotate(' + (finalAngle) + 'deg)';
-		  
+
 		  //if (transform != '')
-		    //yawString.style.transform = transform; 
+		    //yawString.style.transform = transform;
 
 		}
-		
+
 		function vector(angle, length) {
 			angle = angle * Math.PI / 180;
 			return [length * Math.cos(angle), length * Math.sin(angle)]
-		}		
+		}
 
 		function rotate(x, y, angle) {
 			var radians = (Math.PI / 180) * angle,

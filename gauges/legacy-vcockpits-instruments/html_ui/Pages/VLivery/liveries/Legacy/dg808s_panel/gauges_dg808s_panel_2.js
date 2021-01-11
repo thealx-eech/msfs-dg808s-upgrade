@@ -21,7 +21,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     constructor() {
         super();
-        this.VERSION = "v.43";
+        this.VERSION = "v.44";
         // Constants
         this.MS_TO_KT = 1.94384; // speed conversion consts
         this.MS_TO_KPH = 3.6;    // meter per second to kilometer per hour
@@ -782,24 +782,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.nav_display_middle_el = this.querySelector("#nav_display_middle");
         this.nav_display_bottom_el = this.querySelector("#nav_display_bottom");
 
-        // Flightplan info
-        this.nav_display_flightplan_request = false; // Flag when FlightPlanWaypointIndex updated
-        this.nav_display_flightplan_active = SimVar.GetSimVarValue("C:fs9gps:FlightPlanIsActiveFlightPlan","bool");
-
-        // Aircraft data
-        this.nav_display_position = this.nav_display_get_position(); // gets { lat:.., lng:.. } for aircraft position
-
-        // Waypoint data
-        this.nav_display_wp_index = 0;
-        this.nav_display_wp_position;
-        this.nav_display_wp_nam;
-        this.nav_display_wp_alt_m;
-        this.nav_display_wp_type;
-        this.nav_display_wp_bearing = 0;
-
-        this.nav_display_set_wp(); // Set current waypoint info for flightplan index this.nav_display_wp_index
-
-        this.nav_display_wp_count = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointsNumber", "number");
+        // Flightplan
+        this.nav_display_flightplan = new Array();
 
         // Enable all variometer display elements
         this.querySelector(".nav_display_battery_required").style.display = "block";
@@ -819,6 +803,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         if (this.power_switched) {
             if (this.power_status) {
                 this.nav_display_init();
+                this.nav_display_flightplan_update(); // Initiate flightplan request
             } else {
                 this.querySelector(".nav_display_battery_required").style.display = "none";
             }
@@ -829,6 +814,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         if (!this.power_status) {
             return;
         }
+
+        this.nav_display_flightplan_update(); // Continue flightplan request processing
 
         const POWER_UP_TIME_S = 6; // duration (sec) of full power-up sequence
 
@@ -857,22 +844,15 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             this.nav_display_previous_next_var = next_var; // reset for next toggle
             this.nav_display_wp_index += 1;
             // Increment wp index, rotate back to 0 if at end.
-            if (this.nav_display_wp_index >= this.nav_display_wp_count) {
+            if (this.nav_display_wp_index >= this.nav_display_flightplan.length) {
                 this.nav_display_wp_index = 0;
             }
-            // IMPORTANT: here we tell MSFS to change to next flightplan waypoint to index this.nav_display_wp_index
-            this.nav_display_set_wp();
-            return; // Skip to next update cycle and call nav_display_get_wp();
-        }
-
-        // If we have a pending FlightPlanWaypointIndex update, collect the data
-        if (this.nav_display_flightplan_request) {
-            this.nav_display_get_wp();
         }
 
         // Display next WP id
         //let wp_id = SimVar.GetSimVarValue("GPS WP NEXT ID", "string");
-        let top_str = (this.nav_display_wp_index == 0 ? "" : this.nav_display_wp_index+".")+this.nav_display_wp_name;
+        let name = this.nav_display_flightplan[this.nav_display_wp_index].name;
+        let top_str = (this.nav_display_wp_index == 0 ? "" : this.nav_display_wp_index+".")+name;
         if (top_str.length > 8) {
             this.nav_display_top_el.style["font-size"] = Math.floor(22 * (8/top_str.length))+"px";
         } else {
@@ -882,14 +862,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         // Display elevation of WP
         //let height = Math.floor(SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters") * this.M_to_F);
-        let middle_str = Math.floor(this.nav_display_wp_alt_m * this.M_TO_F + 0.5);
+        let alt_ft = Math.floor(this.nav_display_flightplan[this.nav_display_wp_index].alt_m * this.M_TO_F + 0.5);
+        let middle_str = alt_ft;
         this.nav_display_middle_el.innerHTML = middle_str;
 
         let position = this.nav_display_get_position();
 
         // Display distance to WP
         // Calculate distance to next WP, in Km and create display string e.g. "10" or "4.5"
-        let distance = this.get_distance(position, this.nav_display_wp_position) / 1000; //SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointDistance", "meters") / 1000; // distance to WP in Km
+        let wp_position = this.nav_display_flightplan[this.nav_display_wp_index].position;
+        let distance = this.get_distance(position, wp_position) / 1000; //SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointDistance", "meters") / 1000; // distance to WP in Km
         if (distance >= 10) { // Above 10Km, just show whole Km
             distance = distance.toFixed(0);
         } else {             // Below 10Km, show decimals
@@ -898,13 +880,76 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         //let distance = Math.floor(SimVar.GetSimVarValue("GPS WP DISTANCE", "meters") / 1000);
         this.nav_display_bottom_el.innerHTML = distance;
 
-        this.nav_display_wp_bearing = this.get_bearing(position, this.nav_display_wp_position);
+        let wp_bearing = this.get_bearing(position, wp_position);
 
-        let pointer = this.nav_display_bearing_to_pointer(this.nav_display_wp_bearing);
+        let pointer = this.nav_display_bearing_to_pointer(wp_bearing);
 
         this.nav_display_pointer(pointer);
 
     } // end nav_display_update()
+
+    // On power up, this routine will set up the this.nav_display_flightplan array
+    // If an MSFS flightplan is loaded, this routine will pick up the waypoints on successive update cycles
+    nav_display_flightplan_update() {
+        if (this.power_switched && this.power_status) {
+            this.nav_display_flightplan_active = SimVar.GetSimVarValue("C:fs9gps:FlightPlanIsActiveFlightPlan","bool");
+            this.nav_display_wp_index = 0;
+            if (this.nav_display_flightplan_active) {
+                this.nav_display_flightplan_count = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointsNumber", "number");
+                this.nav_display_flightplan_index = 0;
+                // Request first waypoint
+                SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", 0);
+            } else { // No flightplan, so use current position
+                this.nav_display_flightplan[0] = {
+                    position: this.nav_display_get_position(),
+                    name: "HOME",
+                    alt_m: SimVar.GetSimVarValue("GROUND ALTITUDE", "meters"),
+                    type: 5
+                }
+            }
+            // If flightplan is active, then flag request pending for the next update cycle
+            this.nav_display_flightplan_request = this.nav_display_flightplan_active;
+            return; // By returning now we ensure the check below is delayed until the next update cycle
+        }
+
+        // If we have a pending FlightPlanWaypointIndex update, collect the data
+        if (this.nav_display_flightplan_request) {
+            let wp = {
+                position: { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
+                            lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
+                },
+                name: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIdent", "string"),
+                alt_m: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters"),
+                type: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointType", "number")
+            }
+
+            // Fix up WP altitude if included in waypoint name
+            let alt_index = wp.name.lastIndexOf("+");
+            if (alt_index > 0) {
+                let alt_f = parseInt(wp.name.slice(alt_index+1),10); // parse integer base 10
+                if (!isNaN(alt_f)) {
+                    wp.alt_m = alt_f / this.M_TO_F;
+                    wp.name = wp.name.slice(0,alt_index);
+                }
+            }
+            // Store waypoing in our flighplan, unless it's a bullshit MSFS inserted waypoint
+            if (! wp.name.startsWith("TIMECRUIS") && ! wp.name.startsWith("TIMEDSCNT") ) {
+                // Add this waypoint to our internal this.nav_display_flightplan array
+                this.nav_display_flightplan.push(wp);
+            }
+
+            this.nav_display_flightplan_index += 1;
+
+            // If we have more flightplan waypoints to collect, then request the next
+            if (this.nav_display_flightplan_index < this.nav_display_flightplan_count) {
+                // Request next waypoint
+                SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_flightplan_index);
+                // leave this.nav_display_flightplan_request true
+            } else {
+                this.nav_display_flightplan_request = false;
+            }
+        }
+    }
 
     nav_display_update_top_str() {
         // Display next WP id
@@ -923,35 +968,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         return { lat: SimVar.GetSimVarValue("A:PLANE LATITUDE", "radians") * this.RAD_TO_DEG,
                  lng: SimVar.GetSimVarValue("A:PLANE LONGITUDE", "radians") * this.RAD_TO_DEG
         };
-    }
-
-
-    // Set the waypoint index and flag a 'request' is now outstanding
-    nav_display_set_wp() {
-        this.nav_display_flightplan_request = true;
-        if (this.nav_display_flightplan_active) {
-            SimVar.SetSimVarValue("C:fs9gps:FlightPlanWaypointIndex", "number", this.nav_display_wp_index);
-        }
-    }
-
-    // Collect waypoint info from earlier FlightPlanWaypointIndex update
-    // If no flightplan, then return aircraft position info
-    nav_display_get_wp() {
-        if (this.nav_display_flightplan_active) {
-            this.nav_display_wp_position = { lat: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLatitude", "degrees"),
-                                             lng: SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointLongitude", "degrees")
-            };
-
-            this.nav_display_wp_name = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIdent", "string");
-            this.nav_display_wp_alt_m = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointAltitude", "meters");
-            this.nav_display_wp_type = SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointType", "number");
-        } else {
-            this.nav_display_wp_position = this.nav_display_get_position();
-            this.nav_display_wp_name = "HOME";
-            this.nav_display_wp_alt_m = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters");
-            this.nav_display_wp_type = 5;
-        }
-        this.nav_display_flightplan_request = false;
     }
 
     // Given a waypoint bearing, calculate the -3..+3 value for the pointer
@@ -1040,8 +1056,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_enabled = false;
         this.debug_glide_ratio = 50;
         this.debug_airspeed_ms = 0;
-        //DEBUG
-        this.debug_power_was_switched = false;
     }
 
 
@@ -1070,11 +1084,6 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             return;
         }
 
-        //DEBUG
-        if (this.power_switched) {
-            this.debug_power_was_switched = true;
-        }
-
         /* DEBUG DISPLAY IN NAV INSTRUMENT ONCE PER 2 SECONDS */
         if (this.time_s - this.debug_update_time_s > 2) {
             this.debug_update_time_s = this.time_s;
@@ -1100,14 +1109,14 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
             // Winter
             this.debug[9] = this.nav_display_flightplan_active ? "FP:ON" : "FP:OFF";
-            this.debug[10] = "";//SimVar.GetSimVarValue("C:fs9gps:FlightPlanWaypointIndex","bool");
-            this.debug[11] = "";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK", "radians") * this.RAD_TO_DEG).toFixed(0);
+            this.debug[10] = this.nav_display_wp_index;
+            this.debug[11] = this.nav_display_flightplan.length;//"";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK", "radians") * this.RAD_TO_DEG).toFixed(0);
             let te = this.te_ms; // to shorten next line
             this.debug[12] = ""+(te >= 0 ? "+"+te.toFixed(2) : te.toFixed(2));
 
             // Cambridge
-            this.debug[13] = typeof this.power_status; // ? "P.ON" : "POW OFF";
-            this.debug[14] = this.debug_power_was_switched ? "SW" : "NO_SW"; //this.slew_mode ? "SLEW" : "";
+            this.debug[13] = ""; //typeof this.power_status; // ? "P.ON" : "POW OFF";
+            this.debug[14] = "";
             this.debug[15] = this.pause_mode ? "PAUSE" : "";
             this.debug[16] = this.netto_ms.toFixed(2);
 
