@@ -1,6 +1,6 @@
 # FSX DG808S upgrade to MSFS
 
-!(Panel Instruments)[docs/testing_2021-01-07.png]
+![Panel Instruments](docs/testing_2021-01-07.png)
 
 ## Things to do
 
