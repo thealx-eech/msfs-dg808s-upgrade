@@ -12,6 +12,13 @@
         * nav_display
 
     Versions:
+        0.47 - spoiler warning indicator,
+               exception catch in Update,
+               Launch warning indicator (Engine Combustion),
+               Fix for MSFS not knowing GROUND ALTITUDE on flight load.
+
+        0.45 - yawstring, turn&slip fixed
+        0.44 - flightplan can use "NAME+ALT" for waypoints. TIMECRUIS,TIMEDSCNT skipped
         0.42 - version added to code
         0.41 - TE, netto, trim, nav working. Nav middle text 'alt' is just from flightplan.
                TIMECRUIS and TIMEDSCNT waypoints in flightplan.
@@ -21,7 +28,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
     constructor() {
         super();
-        this.VERSION = "v.45";
+        this.VERSION = "v.46e";
+        this.version_init_done = false;
+
         // Constants
         this.MS_TO_KT = 1.94384; // speed conversion consts
         this.MS_TO_KPH = 3.6;    // meter per second to kilometer per hour
@@ -63,7 +72,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         let updateLoop = () => {
             if (!this._isConnected)
                 return;
-            this.Update();
+            try {
+                this.Update();
+            } catch (error) {
+            }
             requestAnimationFrame(updateLoop);
         };
         this._isConnected = true;
@@ -82,6 +94,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     //********************************************************************
 
     // Displays the gauges version (this.VERSION) on the panel
+    // Only runs once on aircraft load.
     version_init() {
         if (this.version_init_done) {
             return;
@@ -133,24 +146,32 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     //********************************************************************
 
     Update() {
-        // Display code version on panel (only on startup)
-        this.version_init();
+        let x; // We use 'x' to flag which routine caused an exception.
+        try {
+            // Display code version on panel (only on startup)
+            x=1;this.version_init();
 
-        // Collect simvar data used by multiple instruments
-        this.global_vars_update();
+            // Collect simvar data used by multiple instruments
+            x=2;this.global_vars_update();
 
-        this.total_energy_update();
-        this.netto_update();
-        this.climb_mode_update();
+            x=3;this.total_energy_update();
+            x=4;this.netto_update();
+            x=5;this.climb_mode_update();
 
-        // Now update instruments
-        this.winter_update();
-        this.asi_update();
-        this.variometer_update();
-        this.nav_display_update();
+            // Now update instruments
+            x=6;this.winter_update();
+            x=7;this.asi_update();
+            x=8;this.variometer_update();
+            x=9;this.nav_display_update();
 
-        // This debug routine paints var values onto panel, toggled with 'L' (lights) key.
-        this.debug_update();
+            // This debug routine paints var values onto panel, toggled with 'L' (lights) key.
+            x=10;this.debug_update();
+        } catch (error) {
+            let version_el = this.querySelector("#debug_version");
+            if (typeof version_el !== "undefined") {
+                version_el.innerHTML = "EX."+x;
+            }
+        }
     }
 
     // **********************************************************************************************************************
@@ -237,12 +258,12 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Update 'global' values from Simvars
     // ************************************************************
     global_vars_update() {
-        this.slew_mode = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool");
+        this.slew_mode = SimVar.GetSimVarValue("IS SLEW ACTIVE", "bool") ? true : false; // Convert number to JS boolean
         // this.pause_mode
-        this.pause_mode_update(); // Set this.pause_mode:
+        this.global_vars_pause(); // Set this.pause_mode:
         // this.power_switch
         // this.power_status
-        this.power_update(); // Set this.power_switch;
+        this.global_vars_power(); // Set this.power_switch;
         this.time_s = SimVar.GetSimVarValue("E:ABSOLUTE TIME", "seconds");
         //this.airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED INDICATED", "feet per second") / this.M_TO_F;
         this.airspeed_ms = SimVar.GetSimVarValue("A:AIRSPEED TRUE", "feet per second") / this.M_TO_F;
@@ -251,20 +272,22 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     }
 
     // update this.pause_mode
-    pause_mode_update() {
+    global_vars_pause() {
+        // Initialize previous speed
+        if (this.pause_mode_previous_speed2 == null) {
+            this.pause_mode_previous_speed2 = -99;
+        }
         // These VELOCITY vars freeze during pause
         let speed2 = SimVar.GetSimVarValue("VELOCITY WORLD Z","feet per second")**2 +
                      SimVar.GetSimVarValue("VELOCITY WORLD X","feet per second")**2;
-        if (this.pause_mode_previous_speed2 != null) {
-            let on_ground = SimVar.GetSimVarValue("SIM ON GROUND","bool");
-            this.pause_mode = !on_ground && (speed2 == this.pause_mode_previous_speed2); // in air and speed EXACTLY fixed
-        }
+        let on_ground = SimVar.GetSimVarValue("SIM ON GROUND","bool") ? true : false;
+        this.pause_mode = !on_ground && (speed2 == this.pause_mode_previous_speed2); // in air and speed EXACTLY fixed
         this.pause_mode_previous_speed2 = speed2;
     }
 
     // Set this.power_switched when power CHANGES - note it will go true FOR A SINGLE UPDATE CYCLE
     // Set this.power_status to true/false if power is ON/OFF
-    power_update() {
+    global_vars_power() {
         this.power_switched = false;
 	    const new_power_status = SimVar.GetSimVarValue("ELECTRICAL MASTER BATTERY", "boolean") ? true : false;
         if (typeof this.power_status === "undefined" ) {
@@ -296,7 +319,7 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         let g = 9.81; // Gravitational constant
 
         // Detect startup and call init()
-        if (this.te_previous_time_s == null) {
+        if (this.te_previous_time_s == null || this.time_s < this.te_previous_time_s) {
             this.total_energy_init();
             return;
         }
@@ -323,6 +346,9 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         //let previous_airspeed_ms = this.airspeed_ms - SimVar.GetSimVarValue("ACCELERATION BODY Z", "feet per second squared") / this.M_TO_F * time_delta_s;
         let airspeed_ms_squared_delta = this.airspeed_ms**2 - this.te_previous_airspeed_ms**2;
+        //DEBUG
+        this.te_acceleration_ms2 = (this.airspeed_ms - this.te_previous_airspeed_ms)/time_delta_s;
+
         //let airspeed_ms_squared_delta = this.airspeed_ms**2 - previous_airspeed_ms**2;
         this.te_compensation_ms = airspeed_ms_squared_delta / (2 * g * time_delta_s);
         this.te_raw_ms = this.vertical_speed_ms + this.te_compensation_ms;
@@ -784,12 +810,23 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
         // Flightplan
         this.nav_display_flightplan = new Array();
+        this.nav_display_flightplan_active = false;
 
         // Enable all variometer display elements
         this.querySelector(".nav_display_battery_required").style.display = "block";
 
-        // Gauge needs to hide previous displayed pointer element
-        this.nav_display_previous_pointer_el = this.querySelector("#nav_display_all"); // start with all pointer elements lit
+        this.nav_display_pointer_status = [false,false,false,false,false,false,false]; // block/none display status of -3,-2,-1,1,2,3
+        this.nav_display_pointers = [ [ true, true, true, true,false,false,false],
+                                      [false, true, true, true,false,false,false],
+                                      [false,false, true, true,false,false,false],
+                                      [false,false,false, true,false,false,false],
+                                      [false,false,false, true, true,false,false],
+                                      [false,false,false, true, true, true,false],
+                                      [false,false,false, true, true, true, true] ];
+        // Gauge needs to hide previous displayed pointer elements
+        this.nav_display_pointer(0);
+        this.nav_display_all_pointers = true;
+        this.querySelector("#nav_display_all").style.display = "block";
 
         this.nav_display_top_el.innerHTML = "B21-NAV";
         this.nav_display_middle_el.innerHTML = "8888";
@@ -828,6 +865,10 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // Do nothing during the power-up delay period
             if (t < 0) {
                 return;
+            }
+            if (this.nav_display_all_pointers) {
+                this.querySelector("#nav_display_all").style.display = "none";
+                this.nav_display_all_pointers = false;
             }
             // Sweep needle across full range -3, .. , +3
             let pointer_value = Math.round(3 * Math.sin(Math.PI / 2 + t / CYCLE_TIME_S * 3 * Math.PI / 2));
@@ -910,6 +951,14 @@ class gauges_dg808s_panel_2 extends TemplateElement {
             // If flightplan is active, then flag request pending for the next update cycle
             this.nav_display_flightplan_request = this.nav_display_flightplan_active;
             return; // By returning now we ensure the check below is delayed until the next update cycle
+        }
+
+        // Fixup if we failed to get GROUND ALTITUDE on startup (maybe MSFS wasn't ready)
+        if (!this.nav_display_flightplan_active &&
+            this.nav_display_flightplan.length > 0 &&
+            this.nav_display_flightplan[0].alt_m == 0 &&
+            SimVar.GetSimVarValue("SIM ON GROUND","bool")) {
+             this.nav_display_flightplan[0].alt_m = SimVar.GetSimVarValue("GROUND ALTITUDE", "meters");
         }
 
         // If we have a pending FlightPlanWaypointIndex update, collect the data
@@ -1012,10 +1061,16 @@ class gauges_dg808s_panel_2 extends TemplateElement {
     // Update the nav display direction pointer arrows
     // pointer is -3 .. +3 (any other number means all)
     nav_display_pointer(pointer) {
-        this.nav_display_previous_pointer_el.style.display = "none";
-        let pointer_id = this.nav_display_pointer_to_id(pointer);
-        this.nav_display_previous_pointer_el = this.querySelector(pointer_id);
-        this.nav_display_previous_pointer_el.style.display = "block";
+        let new_status = this.nav_display_pointers[pointer+3];
+        for (var i=0;i<this.nav_display_pointers.length;i++) {
+            let display = ""; // "" | "block" | "none"
+            if (new_status[i] != this.nav_display_pointer_status[i]) {
+                let pointer_id = this.nav_display_pointer_to_id(i-3);
+                let pointer_el = this.querySelector(pointer_id);
+                pointer_el.style.display = new_status[i] ? "block" : "none";
+                this.nav_display_pointer_status[i] = new_status[i]
+            }
+        }
     }
 
     // Convert a pointer number -4 .. +4 into an element id to display.
@@ -1053,32 +1108,32 @@ class gauges_dg808s_panel_2 extends TemplateElement {
         this.debug_count = 16; // number of debug elements
         this.debug = []; // variables set in gauges to be displayed in debug areas on panel
         this.debug_update_time_s = this.time_s;
-        this.debug_enabled = false;
+        this.debug_previous_enabled = false;
         this.debug_glide_ratio = 50;
         this.debug_airspeed_ms = 0;
     }
 
 
     debug_update() {
-        if (this.debug_update_time_s == null) {
+        if (this.debug_update_time_s == null || this.time_s < this.debug_update_time_s) {
             this.debug_init();
             return;
         }
         // Debug display properties (heavily smoothed)
         let airspeed_true_ms = SimVar.GetSimVarValue("AIRSPEED TRUE", "knots") / this.MS_TO_KT;
-        this.debug_airspeed_ms = 0.98 * this.debug_airspeed_ms + 0.02 * airspeed_true_ms;
+        this.debug_airspeed_ms = 0.99 * this.debug_airspeed_ms + 0.01 * airspeed_true_ms;
         // Guard against divide by zero and irrelevant high L/D in lift
         let glide_ratio = this.te_raw_ms < -0.1 ? -airspeed_true_ms / this.te_raw_ms : 99;
-        this.debug_glide_ratio = 0.98 * this.debug_glide_ratio + 0.02 * Math.min(glide_ratio, 99);
+        this.debug_glide_ratio = 0.99 * this.debug_glide_ratio + 0.01 * Math.min(glide_ratio, 99);
 
         // We will use Landing Light ON/OFF (Ctrl L) to toggle this debug info
-        let debug_enable = SimVar.GetSimVarValue(this.debug_var[0], this.debug_var[1]) ? true : false;
+        let debug_enabled = SimVar.GetSimVarValue(this.debug_var[0], this.debug_var[1]) ? true : false;
 
-        if (debug_enable) {
-            this.debug_enabled = true;
+        if (debug_enabled) {
+            this.debug_previous_enabled = true;
         } else {
-            if (this.debug_enabled) {
-                this.debug_enabled = false;
+            if (this.debug_previous_enabled) {
+                this.debug_previous_enabled = false;
                 this.debug_clear();
             }
             return;
@@ -1097,8 +1152,8 @@ class gauges_dg808s_panel_2 extends TemplateElement {
 
             // ASI
             this.debug[1] = (airspeed_true_ms * this.MS_TO_KPH).toFixed(0); //Math.floor(this.debug_airspeed_ms * this.MS_TO_KPH + 0.5);
-            this.debug[2] = "";
-            this.debug[3] = "";
+            this.debug[2] = this.te_acceleration_ms2.toFixed(1);
+            this.debug[3] = (SimVar.GetSimVarValue("ACCELERATION BODY Z", "feet per second squared")/this.M_TO_F).toFixed(1);
             this.debug[4] = (SimVar.GetSimVarValue("GROUND VELOCITY", "knots")/this.MS_TO_KT*this.MS_TO_KPH).toFixed(1);//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG).toFixed(0);
 
             // nav_display

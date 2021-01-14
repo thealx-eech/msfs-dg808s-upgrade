@@ -18,6 +18,34 @@ gauges_dg808s_panel_2-element .trim_battery_required {
         display: none;
 }
 
+gauges_dg808s_panel_1-element #trim_launch {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/launch.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		display: none;
+		left: 0px;
+		top: 4px;
+		width: 84px;
+		height: 10px;
+}
+
+gauges_dg808s_panel_1-element #trim_spoilers {
+		background: transparent;
+		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/spoilers.png");
+		background-position: 0px 0px;
+		background-repeat: no-repeat;
+		position: absolute;
+		overflow: hidden;
+		display: none;
+		left: 0px;
+		top: 4px;
+		width: 84px;
+		height: 10px;
+}
+
 gauges_dg808s_panel_1-element #trim_gear_down {
 		background: transparent;
 		background-image: url("/Pages/VLivery/Liveries/legacy/dg808s_panel/trim/gear_down.png");

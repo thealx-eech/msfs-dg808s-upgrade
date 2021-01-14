@@ -438,11 +438,25 @@ class gauges_dg808s_panel_1 extends TemplateElement {
             return;
         }
 
+        let trim_spoilers_el = this.querySelector("#trim_spoilers");
+		if (typeof trim_spoilers_el !== "undefined") {
+            let spoilers = SimVar.GetSimVarValue("A:SPOILERS HANDLE POSITION", "number") > 0;
+            trim_spoilers_el.style.display = spoilers ? "block" : "none";
+		}
+
+        // Note if gear is down, this will overlay spoilers warning, as intended
         let trim_gear_down_el = this.querySelector("#trim_gear_down");
 		if (typeof trim_gear_down_el !== "undefined") {
-            let gear_position = SimVar.GetSimVarValue("A:GEAR HANDLE POSITION", "bool"); // true = GEAR DOWN
+            let gear_position = SimVar.GetSimVarValue("A:GEAR HANDLE POSITION", "bool") ? true : false; // true = GEAR DOWN
             trim_gear_down_el.style.display = gear_position ? "block" : "none";
 		}
+
+        let trim_launch_el = this.querySelector("#trim_launch");
+		if (typeof trim_launch_el !== "undefined") {
+            let launch = SimVar.GetSimVarValue("A:GENERAL ENG COMBUSTION:1", "bool") ? true : false;
+            trim_launch_el.style.display = launch ? "block" : "none";
+		}
+
         let pointer_el = this.querySelector("#trim_pointer");
 		if (typeof pointer_el !== "undefined") {
             const SCALE_WIDTH = 80; // pixel width of scale line
@@ -488,10 +502,10 @@ class gauges_dg808s_panel_1 extends TemplateElement {
         if (this.TIME_S - this.debug_update_time_s > 2) {
             this.debug_update_time_s = this.TIME_S;
 
-            this.debug[1] = "W";
-            this.debug[2] = "X";
-            this.debug[3] = "Y";
-            this.debug[4] = SimVar.GetSimVarValue("TURN COORDINATOR BALL","number").toFixed(5);
+            this.debug[1] = "";//"W";
+            this.debug[2] = "";//SimVar.GetSimVarValue("A:GENERAL ENG COMBUSTION:1", "bool");//"X";
+            this.debug[3] = "";//SimVar.GetSimVarValue("A:GENERAL ENG RPM:1", "number").toFixed(0);//"";//"Y";
+            this.debug[4] = "";//SimVar.GetSimVarValue("A:TOTAL WEIGHT", "pounds").toFixed(1);//SimVar.GetSimVarValue("TURN COORDINATOR BALL","number").toFixed(5);
 
             let debug_el;
 

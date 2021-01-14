@@ -55,11 +55,16 @@ class gauges_dg808s_panel_3 extends TemplateElement {
 
     // Get yawstring angle +/- 60 degrees
     get_yawstring_angle_deg() {
-        let track_deg = SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG;
         let heading_deg = SimVar.GetSimVarValue("PLANE HEADING DEGREES TRUE", "radians") * this.RAD_TO_DEG;
-        this.yawstring_delta_deg = this.delta_deg(track_deg, heading_deg);
-        let wind_x_kt = SimVar.GetSimVarValue("AIRCRAFT WIND X","knots");
         let ground_speed_kt = Math.max(SimVar.GetSimVarValue("GPS GROUND SPEED", "knots"),1); // Avoid divide by zero
+        if (ground_speed_kt <= 1) { // If we're ~stationary, use a simpler calculation
+            let wind_direction_deg = SimVar.GetSimVarValue("AMBIENT WIND DIRECTION", "degrees");
+            let delta = this.delta_deg(wind_direction_deg, heading_deg);
+            return Math.max(Math.min(delta,60),-60);
+        }
+        let track_deg = SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG;
+        this.yawstring_delta_deg = this.delta_deg(track_deg, heading_deg);
+        let wind_x_kt = SimVar.GetSimVarValue("AIRCRAFT WIND X","knots"); // Note this var does not work at low aircraft speed...
         this.yawstring_crosswind_deg = Math.atan(wind_x_kt/ground_speed_kt)*this.RAD_TO_DEG;
 
         return Math.max(Math.min(this.yawstring_delta_deg + this.yawstring_crosswind_deg, 60),-60);
@@ -188,8 +193,8 @@ class gauges_dg808s_panel_3 extends TemplateElement {
 
             this.debug[1] = "";//(SimVar.GetSimVarValue("GPS GROUND TRUE TRACK","radians") * this.RAD_TO_DEG).toFixed(2);
             this.debug[2] = "";//(SimVar.GetSimVarValue("PLANE HEADING DEGREES TRUE", "radians") * this.RAD_TO_DEG).toFixed(2);
-            this.debug[3] = "";//(Math.atan(SimVar.GetSimVarValue("AIRCRAFT WIND X","knots")/SimVar.GetSimVarValue("GPS GROUND SPEED", "knots"))*this.RAD_TO_DEG).toFixed(4);
-            this.debug[4] = "";//this.get_yawstring_angle_deg().toFixed(2);
+            this.debug[3] = "";//SimVar.GetSimVarValue("AIRCRAFT WIND X","knots");
+            this.debug[4] = "";//SimVar.GetSimVarValue("AMBIENT WIND DIRECTION", "degrees").toFixed(1);
 
             let debug_el;
 
