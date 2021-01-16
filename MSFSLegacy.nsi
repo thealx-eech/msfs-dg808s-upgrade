@@ -1,5 +1,7 @@
 ;NSIS Modern User Interface
 
+Unicode True
+
 ;--------------------------------
 ;Include Modern UI
 
@@ -55,12 +57,11 @@
 
 ;--------------------------------
 ;Installer Sections
-Section "Remove legacy files" SectionINI
+Section "Remove previous version" SectionLegacy
 
-	RMDir /R "$INSTDIR\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\"
-	RMDir /R "$INSTDIR\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\Soundai\"
-	Delete "$INSTDIR\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\DG808S.air"
+	RMDir /R "$INSTDIR\${AIRPLANEID}\"
 	RMDir /R "$INSTDIR\${AIRPLANEID}_CVT_\"
+	RMDir /R "$INSTDIR\legacy-vcockpits-instruments\html_ui\Pages\VLivery\liveries\Legacy\dg808s_panel\"
 
 SectionEnd
 
@@ -83,10 +84,10 @@ Section "Aircraft files" SectionSystem
 	;MISSING PCK WARNING
 	IfFileExists "$INSTDIR\${AIRPLANEID}\SimObjects\Airplanes\${FSXAIRPLANEID}\sound\Asobo_VL3.PC.PCK" +3 0
 	MessageBox MB_ICONEXCLAMATION \
-	"File \asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK does not exists. Aircraft sounds will not work, contact mod authors or community members about this issue."
+	"File \asobo-aircraft-vl3\SimObjects\Airplanes\Asobo_VL3\sound\Asobo_VL3.PC.PCK does not exists. Aircraft sounds will not work, you can try to copy them manually."
 SectionEnd
 
-Section "cockpit gauges" Section1161Dyn
+Section "Cockpit gauges" SectionGauges
 
 	SetOutPath "$INSTDIR\"
 	File /r "${BLDDIR}\gauges\"
@@ -99,14 +100,13 @@ SectionEnd
 ;Descriptions
 
 	;Language strings
-	LangString DESC_SectionLegacy ${LANG_ENGLISH} "Remove legacy files if aircraft already imported (AIR file, WAV sound samples)"
+	LangString DESC_SectionLegacy ${LANG_ENGLISH} "Uninstall old version of this add-on to avoid conflicts"
 	LangString DESC_SectionAircraft ${LANG_ENGLISH} "Main aircraft files - models, textures and configs"
 	LangString DESC_SectionGauges ${LANG_ENGLISH} "Cockpit gauge scripts. Can be unchecked if you are installing this aircraft only for it appearance in multiplayer game."
 
 	;Assign language strings to sections
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${SectionSystem} $(DESC_SectionAircraft)
-	!insertmacro MUI_DESCRIPTION_TEXT ${Section1161Dyn} $(DESC_SectionGauges)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SectionINI} $(DESC_SectionLegacy)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SectionGauges} $(DESC_SectionGauges)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SectionLegacy} $(DESC_SectionLegacy)
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
-;--------------------------------

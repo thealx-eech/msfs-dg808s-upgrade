@@ -2,8 +2,8 @@
   "content": [
     {
       "path": "SimObjects/AIRPLANES/DG808S/aircraft.cfg",
-      "size": 22459,
-      "date": 132545757380000000
+      "size": 22475,
+      "date": 132551297542811674
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/Approach.flt",
@@ -47,8 +47,8 @@
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/flight_model.cfg",
-      "size": 21750,
-      "date": 132550432380000000
+      "size": 21754,
+      "date": 132551816938754520
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/gameplay.cfg",
@@ -62,8 +62,8 @@
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/readme.txt",
-      "size": 5863,
-      "date": 132524866100000000
+      "size": 11678,
+      "date": 132551871100860281
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/runway.flt",
@@ -87,8 +87,8 @@
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/model/DG808S_Interior.mdl",
-      "size": 1097293,
-      "date": 132526666760000000
+      "size": 2023129,
+      "date": 132551814940990261
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/model/model.cfg",
@@ -102,8 +102,8 @@
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/model.VR/DG808S_Interior.mdl",
-      "size": 1097293,
-      "date": 132526270760000000
+      "size": 2023129,
+      "date": 132551814940990261
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/model.VR/model.cfg",
@@ -171,11 +171,6 @@
       "date": 127918020240000000
     },
     {
-      "path": "SimObjects/AIRPLANES/DG808S/sound/Asobo_VL3.PC.PCK",
-      "size": 88499613,
-      "date": 132545386093498461
-    },
-    {
       "path": "SimObjects/AIRPLANES/DG808S/sound/sound.xml",
       "size": 18525,
       "date": 132541024800000000
@@ -191,11 +186,6 @@
       "date": 132518647120000000
     },
     {
-      "path": "SimObjects/AIRPLANES/DG808S/Soundai/Asobo_VL3_AI.PC.PCK",
-      "size": 10160750,
-      "date": 132421794130000000
-    },
-    {
       "path": "SimObjects/AIRPLANES/DG808S/Soundai/soundai.xml",
       "size": 2657,
       "date": 132464153540000000
@@ -206,9 +196,19 @@
       "date": 132524534940000000
     },
     {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_1_c_spec.dds",
+      "size": 22369776,
+      "date": 132524987872095104
+    },
+    {
       "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_2_c.dds",
       "size": 22369776,
       "date": 132524535600000000
+    },
+    {
+      "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_2_c_spec.dds",
+      "size": 22369776,
+      "date": 132551776235371762
     },
     {
       "path": "SimObjects/AIRPLANES/DG808S/texture/dg808s_c.dds",
